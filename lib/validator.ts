@@ -29,3 +29,11 @@ export const productSchema = z.object({
   numReviews: z.number().min(0).optional(),
   banner: z.string().nullable().optional(),
 });
+
+// Schema for signin users in
+export const userSignInSchema = z.object({
+  email: z
+    .string()
+    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters long"),
+});
