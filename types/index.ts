@@ -6,3 +6,10 @@ export type Product = z.infer<typeof productSchema> & {
   rating: string;
   createdAt: Date;
 };
+
+export type CallBackProps = {
+  session: import("next-auth").Session;
+  token: import("next-auth/jwt").JWT;
+  user?: import("next-auth").User;
+  trigger?: "update" | "signIn" | "signUp";
+};

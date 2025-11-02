@@ -9,6 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import UserButton from "./user-Button";
 
 const MenuBar = () => {
   return (
@@ -22,11 +23,7 @@ const MenuBar = () => {
             </Link>
           </Button>
 
-          <Button asChild>
-            <Link href="/sign-in">
-              <UserIcon /> Sign In
-            </Link>
-          </Button>
+          <UserButton />
         </div>
       </nav>
 

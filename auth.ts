@@ -4,6 +4,8 @@ import { prisma } from "@/db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compareSync } from "bcrypt-ts-edge";
 import type { NextAuthConfig } from "next-auth";
+import { CallBackProps } from "@/types";
+import { JWT } from "next-auth/jwt";
 
 export const config = {
   pages: {
@@ -53,20 +55,13 @@ export const config = {
     }),
   ],
   callbacks: {
-    async session({
-      session,
-      user,
-      trigger,
-      token,
-    }: {
-      session: import("next-auth").Session;
-      user?: import("next-auth").User;
-      trigger?: "update";
-      token: import("next-auth/jwt").JWT;
-    }) {
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async session({ session, user, trigger, token }: any) {
       // Set the user ID from the token
       if (session.user) {
         session.user.id = token.sub;
+        session.user.role = token.role;
+        session.user.name = token.name;
       }
 
       // If there is an update, set the username
@@ -75,6 +70,26 @@ export const config = {
       }
 
       return session;
+    },
+
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async jwt({ token, user, trigger, session }: any) {
+      // Assign user fields to token
+      if (user) {
+        token.role = user.role;
+
+        //IF user has no name then use the email
+        if (user.name === "NO_NAME") {
+          token.name = user.email!.split("@")[0];
+        }
+
+        //Update database to reflect the token name
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { name: token.name },
+        });
+      }
+      return token;
     },
   },
 } satisfies NextAuthConfig;

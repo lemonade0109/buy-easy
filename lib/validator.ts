@@ -1,5 +1,7 @@
 import { z } from "zod";
+
 import { formatNumberWithDecimal } from "./utils";
+import { prisma } from "@/db/prisma";
 
 export const currency = z
   .string()
@@ -8,6 +10,7 @@ export const currency = z
     "price must have two decimal places"
   );
 
+//Schema for inserting Products
 export const productSchema = z.object({
   id: z.string().optional(),
   name: z
@@ -37,3 +40,46 @@ export const userSignInSchema = z.object({
     .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
 });
+
+// Schema for signing up users
+export const userSignUpSchema = z
+  .object({
+    name: z.string().min(3, "Name must be at least 3 characters"),
+    email: z
+      .string()
+      .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters long"),
+    confirmPassword: z
+      .string()
+      .min(6, "Confirm password must be at least 6 characters"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Password don't match",
+    path: ["confirmPassword"],
+  });
+
+export function validateWithZodSchema<S extends z.ZodTypeAny>(
+  schema: S,
+  data: unknown
+): z.infer<S> {
+  const results = schema.safeParse(data);
+
+  if (!results.success) {
+    const errors = results.error.issues.map((issue) => issue.message);
+    throw new Error(errors.join(", "));
+  }
+
+  return results.data as z.infer<S>;
+}
+
+//validate email existence
+export async function emailExists(email: string): Promise<boolean> {
+  const user = await prisma.user.findFirst({
+    where: { email: { equals: email, mode: "insensitive" } },
+    select: { id: true },
+  });
+
+  return !!user;
+}
+
+//Cart item schema
