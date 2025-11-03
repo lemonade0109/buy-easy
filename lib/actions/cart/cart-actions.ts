@@ -12,7 +12,6 @@ import {
   validateWithZodSchema,
 } from "@/lib/validator";
 import { CartItem } from "@/types";
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -73,7 +72,6 @@ export async function addToCart(data: CartItem) {
         data: newCartItems,
       });
 
-      // Revalidate product page
       revalidatePath(`/product/${product.slug}`);
       return {
         success: true,
@@ -108,12 +106,11 @@ export async function addToCart(data: CartItem) {
       await prisma.cart.update({
         where: { id: cartItems.id },
         data: {
-          items: cartItems.items as Prisma.CartUpdateitemsInput[],
+          items: cartItems.items,
           ...calcPrices(cartItems.items as CartItem[]),
         },
       });
 
-      // Revalidate product page
       revalidatePath(`/product/${product.slug}`);
 
       return {
@@ -197,7 +194,8 @@ export async function removeFromCart(productId: string) {
     await prisma.cart.update({
       where: { id: cartItems.id },
       data: {
-        items: cartItems.items as Prisma.CartUpdateitemsInput[],
+        // items is stored as JSON[] in the database - pass plain JS array
+        items: cartItems.items,
         ...calcPrices(cartItems.items as CartItem[]),
       },
     });
