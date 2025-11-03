@@ -5,9 +5,14 @@ import {
   cartItemSchema,
 } from "../lib/validator";
 
-export type Product = z.infer<typeof productSchema> & {
+export type Product = Omit<
+  z.infer<typeof productSchema>,
+  "price" | "rating" | "stockCount"
+> & {
   id: string;
+  price: string;
   rating: string;
+  stockCount: number;
   createdAt: Date;
 };
 

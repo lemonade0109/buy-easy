@@ -14,7 +14,11 @@ const connectionString = `${process.env.DATABASE_URL}`;
 const adapter = new PrismaNeon({ connectionString });
 
 // Extends the PrismaClient with a custom result transformer to convert the price and rating fields to strings.
-export const prisma = new PrismaClient({ adapter }).$extends({
+const _prisma = new PrismaClient({ adapter });
+
+// Apply runtime $extends but keep exported type as PrismaClient so model
+// properties (like prisma.cart) remain available to TypeScript during build.
+export const prisma = _prisma.$extends({
   result: {
     product: {
       price: {
@@ -29,4 +33,4 @@ export const prisma = new PrismaClient({ adapter }).$extends({
       },
     },
   },
-});
+}) as unknown as PrismaClient;
