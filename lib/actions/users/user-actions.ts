@@ -18,11 +18,6 @@ export async function signInUserWithCredentials(
   formData: FormData
 ) {
   try {
-    // Coerce FormData values to strings to avoid passing `null` into Zod
-    // const userData = userSignInSchema.parse({
-    //   email: String(formData.get("email") ?? ""),
-    //   password: String(formData.get("password") ?? ""),
-    // });
     const rawData = Object.fromEntries(formData);
     const validatedData = validateWithZodSchema(userSignInSchema, rawData);
 

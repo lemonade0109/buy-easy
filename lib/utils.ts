@@ -24,3 +24,14 @@ export function renderError(error: any): { message: string } {
     message: error instanceof Error ? error.message : "An error occurred",
   };
 }
+
+// Round num to 2 decimal places
+export function roundToTwoDecimalPlaces(val: number | string) {
+  if (typeof val === "number") {
+    return Math.round((val + Number.EPSILON) * 100) / 100;
+  } else if (typeof val === "string") {
+    return Math.round((Number(val) + Number.EPSILON) * 100) / 100;
+  } else {
+    throw new Error("Value is not a number or string");
+  }
+}

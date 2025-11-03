@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { formatNumberWithDecimal } from "./utils";
 import { prisma } from "@/db/prisma";
+import { use } from "react";
 
 export const currency = z
   .string()
@@ -83,3 +84,21 @@ export async function emailExists(email: string): Promise<boolean> {
 }
 
 //Cart item schema
+export const cartItemSchema = z.object({
+  productId: z.string().min(1, "Product ID is required"),
+  quantity: z.number().min(1, "Quantity must be at least 1"),
+  name: z.string().min(3).max(100),
+  price: currency,
+  image: z.string().min(1, "Image URL is required"),
+  slug: z.string().min(3).max(100),
+});
+
+export const insertCartSchema = z.object({
+  sessionCartId: z.string().min(1, "Session cart ID is required"),
+  items: z.array(cartItemSchema).min(1, "Cart must have at least one item"),
+  itemsPrice: currency,
+  taxPrice: currency,
+  shippingPrice: currency,
+  totalPrice: currency,
+  userId: z.string().optional().nullable(),
+});

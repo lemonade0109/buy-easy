@@ -13,8 +13,8 @@ const ProductImages = ({ images }: { images: string[] }) => {
         <Image
           src={selectedImage}
           alt="Product Image"
-          layout="fill"
-          objectFit="contain"
+          fill
+          style={{ objectFit: "contain" }}
         />
       </div>
       <div className="flex gap-2 mt-2">

@@ -4,6 +4,7 @@ import { APP_NAME, SERVER_URL } from "@/lib/constants";
 import { APP_DESCRIPTION } from "@/lib/constants";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
+import ToastProvider from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,6 +34,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <ToastProvider />
         </ThemeProvider>
       </body>
     </html>
