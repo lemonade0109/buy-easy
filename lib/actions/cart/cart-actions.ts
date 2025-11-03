@@ -12,6 +12,7 @@ import {
   validateWithZodSchema,
 } from "@/lib/validator";
 import { CartItem } from "@/types";
+import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -107,7 +108,7 @@ export async function addToCart(data: CartItem) {
       await prisma.cart.update({
         where: { id: cartItems.id },
         data: {
-          items: cartItems.items,
+          items: cartItems.items as Prisma.CartUpdateitemsInput[],
           ...calcPrices(cartItems.items as CartItem[]),
         },
       });
@@ -196,7 +197,7 @@ export async function removeFromCart(productId: string) {
     await prisma.cart.update({
       where: { id: cartItems.id },
       data: {
-        items: cartItems.items,
+        items: cartItems.items as Prisma.CartUpdateitemsInput[],
         ...calcPrices(cartItems.items as CartItem[]),
       },
     });
