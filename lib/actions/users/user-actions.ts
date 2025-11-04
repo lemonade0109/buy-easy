@@ -94,7 +94,10 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 // Action to sign out user
 export async function signOutUser() {
   console.log("signOutUser called");
-  await signOut();
+  // Provide an explicit redirectTo to avoid cases where NEXTAUTH_URL is missing
+  // or misconfigured in production which can cause NextAuth to redirect to
+  // `undefined`. Redirect back to the site root after sign-out.
+  await signOut({ redirectTo: "/" });
   console.log("signOutUser completed");
 }
 
