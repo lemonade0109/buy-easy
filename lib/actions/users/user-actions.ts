@@ -93,7 +93,9 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
 // Action to sign out user
 export async function signOutUser() {
+  console.log("signOutUser called");
   await signOut();
+  console.log("signOutUser completed");
 }
 
 // Get user by ID
