@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import UserButton from "./user-Button";
+//import UserButton from "./user-Button";
 
 const MenuBar = () => {
   return (
@@ -23,7 +23,7 @@ const MenuBar = () => {
             </Link>
           </Button>
 
-          <UserButton />
+          {/* <UserButton /> */}
         </div>
       </nav>
 
