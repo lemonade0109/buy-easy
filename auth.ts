@@ -139,7 +139,6 @@ export const config = {
 
       // Get pathname for url object
       const { pathname } = request.nextUrl;
-      console.log(pathname);
 
       // Check if user is not authenticated and accessing a protected path.
       const isAuthenticated = !!(auth && auth.user);

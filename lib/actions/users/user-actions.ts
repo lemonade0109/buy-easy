@@ -39,11 +39,6 @@ export async function signInUserWithCredentials(
       throw error;
     }
 
-    // Log the error server-side to aid debugging and return the message to the client
-    // (keep generic for production; this is intentionally more verbose to help debug now)
-    // eslint-disable-next-line no-console
-    console.error("signInUserWithCredentials error:", error);
-
     const message =
       error instanceof Error && error.message
         ? error.message
