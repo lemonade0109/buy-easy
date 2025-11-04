@@ -93,10 +93,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
 // Action to sign out user
 export async function signOutUser() {
-  // Return the result of signOut so Next.js client receives the redirect/Response.
-  // Provide a safe fallback redirectTo to avoid `/undefined` when NEXTAUTH_URL
-  // is misconfigured in production.
-  return await signOut({ redirectTo: "/" });
+  await signOut();
 }
 
 // Get user by ID
