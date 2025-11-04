@@ -15,22 +15,10 @@ import { UserIcon } from "lucide-react";
 const UserButton = async () => {
   const session = await auth();
 
-  // Server-side debug logging: print minimal session info to Vercel logs.
-  // Do NOT log secrets or tokens. This helps diagnose whether server-side
-  // rendering sees a session in production.
-  try {
-    // eslint-disable-next-line no-console
-    console.log("UserButton session:", {
-      hasSession: !!session,
-      userId: session?.user?.id ?? null,
-      hasName: !!session?.user?.name,
-      hasEmail: !!session?.user?.email,
-    });
-  } catch (e) {
-    // ignore logging errors
-  }
-
-  if (!session) {
+  // Guard on the presence of an actual signed-in user. `auth()` may return an
+  // object even when no user is authenticated; check `session.user.id` to be
+  // certain a user is signed in before rendering the signed-in UI.
+  if (!session?.user?.id) {
     return (
       <Button asChild>
         <Link href="/sign-in">
@@ -41,7 +29,9 @@ const UserButton = async () => {
     );
   }
 
-  const firstInitial = session?.user?.name?.charAt(0).toUpperCase();
+  const firstInitial = session.user?.name
+    ? session.user.name.charAt(0).toUpperCase()
+    : null;
 
   return (
     <div className="flex gap-2 items-center">
