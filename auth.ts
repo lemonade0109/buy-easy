@@ -9,6 +9,9 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 export const config = {
+  // Enable debug logging for NextAuth to surface detailed server-side logs
+  // (set to `false` or remove before long-term production use)
+  debug: true,
   pages: {
     signIn: "/sign-in",
     error: "/sign-in",
