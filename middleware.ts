@@ -23,9 +23,34 @@ export function middleware(req: NextRequest) {
         maxAge: 60 * 60 * 24 * 30, // 30 days
       });
     }
-  } catch (e) {
-    // Don't block requests on cookie setting errors; just continue.
-    // Keeping this catch prevents runtime errors from bubbling into the response.
+  } catch (e) {}
+
+  // Protect specific routes by checking for NextAuth session cookies.
+  // We avoid importing NextAuth so this stays small for Edge bundles.
+  const protectedPath = [
+    /\/shipping-address/,
+    /\/payment-method/,
+    /\/place-order/,
+    /\/profile/,
+    /\/user\/(.*)/,
+    /\/order\/(.*)/,
+    /\/admin/,
+  ];
+
+  const { pathname } = req.nextUrl;
+  const isProtected = protectedPath.some((r) => r.test(pathname));
+
+  if (isProtected) {
+    // NextAuth session cookie names can vary (secure prefix when using HTTPS).
+    const hasSessionCookie = !!(
+      req.cookies.get("__Secure-next-auth.session-token") ||
+      req.cookies.get("next-auth.session-token")
+    );
+
+    if (!hasSessionCookie) {
+      // Redirect unauthenticated users to sign-in.
+      return NextResponse.redirect(new URL("/sign-in", req.url));
+    }
   }
 
   return res;

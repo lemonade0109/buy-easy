@@ -3,6 +3,7 @@ import {
   productSchema,
   insertCartSchema,
   cartItemSchema,
+  shippingAddressSchema,
 } from "../lib/validator";
 
 export type Product = Omit<
@@ -20,9 +21,4 @@ export type CartItem = z.infer<typeof cartItemSchema>;
 
 export type Cart = z.infer<typeof insertCartSchema>;
 
-export type CallBackProps = {
-  session: import("next-auth").Session;
-  token: import("next-auth/jwt").JWT;
-  user?: import("next-auth").User;
-  trigger?: "update" | "signIn" | "signUp";
-};
+export type ShippingAddress = z.infer<typeof shippingAddressSchema>;
