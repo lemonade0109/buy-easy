@@ -29,7 +29,9 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
       {!cart || cart.items.length === 0 ? (
         <div className="">
           <p>Your cart is empty.</p>
-          <Link href={"/"}>Go Shopping</Link>
+          <Link href={"/"} className="text-gray-500 hover:underline">
+            Go Shopping
+          </Link>
         </div>
       ) : (
         <div className="grid md:grid-cols-4 md:gap-5">

@@ -30,9 +30,14 @@ export async function signInUserWithCredentials(
 ) {
   try {
     const rawData = Object.fromEntries(formData);
+    const callbackUrl = (rawData.callbackUrl as string) || "/";
     const validatedData = validateWithZodSchema(userSignInSchema, rawData);
 
-    await signIn("credentials", validatedData);
+    await signIn("credentials", {
+      ...validatedData,
+      redirect: true,
+      redirectTo: callbackUrl,
+    });
     return { success: true, message: "Signed in successfully" };
   } catch (error) {
     if (isRedirectError(error)) {
@@ -44,7 +49,7 @@ export async function signInUserWithCredentials(
         ? error.message
         : "Incorrect username or password";
 
-    return { success: false, message };
+    return { success: false, ...renderError(message) };
   }
 }
 
@@ -52,6 +57,7 @@ export async function signInUserWithCredentials(
 export async function signUpUser(prevState: unknown, formData: FormData) {
   try {
     const rawData = Object.fromEntries(formData);
+    const callbackUrl = (rawData.callbackUrl as string) || "/";
     const validatedData = validateWithZodSchema(userSignUpSchema, rawData);
 
     if (await emailExists(validatedData.email)) {
@@ -72,6 +78,8 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
     await signIn("credentials", {
       email: validatedData.email,
       password: plainPassword,
+      redirect: true,
+      redirectTo: callbackUrl,
     });
 
     return { success: true, message: "User created successfully" };
@@ -93,7 +101,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
 // Action to sign out user
 export async function signOutUser() {
-  await signOut();
+  await signOut({ redirect: true, redirectTo: "/" });
 }
 
 // Get user by ID

@@ -15,9 +15,6 @@ import { UserIcon } from "lucide-react";
 const UserButton = async () => {
   const session = await auth();
 
-  // Guard on the presence of an actual signed-in user. `auth()` may return an
-  // object even when no user is authenticated; check `session.user.id` to be
-  // certain a user is signed in before rendering the signed-in UI.
   if (!session?.user?.id) {
     return (
       <Button asChild>

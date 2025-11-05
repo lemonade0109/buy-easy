@@ -1,62 +1,78 @@
+import { auth } from "@/auth";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
-// Lightweight middleware: only ensures a session_cartId cookie exists.
-// Avoids importing auth/prisma or other heavy server libs so this file stays small (<1MB).
-export function middleware(req: NextRequest) {
-  const res = NextResponse.next();
+const protectedRoutes = [
+  /\/shipping-address/,
+  /\/payment-method/,
+  /\/place-order/,
+  /\/profile/,
+  /\/user\/(.*)/,
+  /\/order\/(.*)/,
+  /\/admin/,
+];
 
-  try {
-    const existing = req.cookies.get("session_cartId")?.value;
-    if (!existing) {
-      // Use crypto.randomUUID when available (Edge runtime); fall back to a short random id.
-      const id =
-        //eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (globalThis as any).crypto?.randomUUID?.() ??
-        Math.random().toString(36).slice(2, 10);
-      res.cookies.set({
-        name: "session_cartId",
-        value: id,
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 30, // 30 days
-      });
-    }
-  } catch (e) {}
+export default auth((req) => {
+  // Ensure a session_cartId cookie exists. Use the Web Crypto API when
+  // available (Edge-friendly). Avoid importing the Node `crypto` module in
+  // middleware to keep the Edge bundle small.
+  const existingSessionCart = req.cookies.get("session_cartId")?.value;
 
-  // Protect specific routes by checking for NextAuth session cookies.
-  // We avoid importing NextAuth so this stays small for Edge bundles.
-  const protectedPath = [
-    /\/shipping-address/,
-    /\/payment-method/,
-    /\/place-order/,
-    /\/profile/,
-    /\/user\/(.*)/,
-    /\/order\/(.*)/,
-    /\/admin/,
-  ];
+  // Prepare a default next response we can attach cookies to if needed.
+  const defaultRes = NextResponse.next();
 
-  const { pathname } = req.nextUrl;
-  const isProtected = protectedPath.some((r) => r.test(pathname));
-
-  if (isProtected) {
-    // NextAuth session cookie names can vary (secure prefix when using HTTPS).
-    const hasSessionCookie = !!(
-      req.cookies.get("__Secure-next-auth.session-token") ||
-      req.cookies.get("next-auth.session-token")
-    );
-
-    if (!hasSessionCookie) {
-      // Redirect unauthenticated users to sign-in.
-      return NextResponse.redirect(new URL("/sign-in", req.url));
-    }
+  // If missing, generate an id and attach it to the default response.
+  if (!existingSessionCart) {
+    const id =
+      //eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (globalThis as any).crypto?.randomUUID?.() ??
+      Math.random().toString(36).slice(2, 10);
+    defaultRes.cookies.set({
+      name: "session_cartId",
+      value: id,
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+    });
   }
 
-  return res;
-}
+  const isProtected = protectedRoutes.some((route) =>
+    route.test(req.nextUrl.pathname)
+  );
+  const isLoggedIn = !!req.auth;
 
-// Match most routes but exclude API, _next and static assets.
+  if (isProtected && !isLoggedIn) {
+    const url = new URL("/sign-in", req.url);
+    url.searchParams.set(
+      "callbackUrl",
+      req.nextUrl.pathname + req.nextUrl.search
+    );
+
+    // Create the redirect response and, if we generated a session_cartId,
+    // attach the same cookie to the redirect response so the browser will
+    // receive it even when redirected.
+    const redirectRes = NextResponse.redirect(url);
+    if (!existingSessionCart) {
+      const id = defaultRes.cookies.get("session_cartId")?.value;
+      if (id) {
+        redirectRes.cookies.set({
+          name: "session_cartId",
+          value: id,
+          httpOnly: true,
+          sameSite: "lax",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 30,
+        });
+      }
+    }
+
+    return redirectRes;
+  }
+
+  // If we didn't need to redirect, return the default response (may have the cookie).
+  return defaultRes;
+});
+
 export const config = {
-  matcher: ["/((?!api|_next|static|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth).*)"],
 };
