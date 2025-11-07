@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { formatNumberWithDecimal } from "./utils";
+import { PAYMENT_METHODS } from "./constants";
 
 export const currency = z
   .string()
@@ -98,5 +99,42 @@ export const shippingAddressSchema = z.object({
   city: z.string().min(2, "City must be at least 2 characters"),
   postalCode: z.string().min(2, "Postal code must be at least 2 characters"),
   country: z.string().min(2, "Country must be at least 2 characters"),
-  phone: z.string().min(10, "Phone number must be at least 10 characters"),
+});
+
+// Schema for payment method
+export const paymentMethodSchema = z
+  .object({
+    type: z.string().min(2, "Payment method type is required"),
+  })
+  .refine((data) => {
+    return (
+      PAYMENT_METHODS.includes(data.type),
+      {
+        path: ["type"],
+        message: "Invalid payment method type",
+      }
+    );
+  });
+
+// Schema for inserting order
+export const insertOrderSchema = z.object({
+  userId: z.string().min(1, "User is required"),
+  itemsPrice: currency,
+  shippingPrice: currency,
+  taxPrice: currency,
+  paymentMethod: z.string().refine((data) => PAYMENT_METHODS.includes(data), {
+    message: "Invalid payment method",
+  }),
+  totalPrice: currency,
+  shippingAddress: shippingAddressSchema,
+});
+
+// Schema for inserting order item
+export const insertOrderItemSchema = z.object({
+  productId: z.string(),
+  image: z.string(),
+  slug: z.string(),
+  name: z.string(),
+  quantity: z.number().min(1),
+  price: currency,
 });

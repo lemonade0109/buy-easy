@@ -8,11 +8,11 @@ import { signUpDefaultValues } from "@/lib/constants";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import React, { useActionState } from "react";
+import React from "react";
 import { useFormStatus } from "react-dom";
 
 const SignUpForm = () => {
-  const [data, action] = useActionState(signUpUser, {
+  const [data, action] = React.useActionState(signUpUser, {
     success: false,
     message: "",
   });

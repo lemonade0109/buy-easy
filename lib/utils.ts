@@ -51,3 +51,40 @@ export function formatCurrency(amount: number | string | null) {
     return "NaN";
   }
 }
+
+// Shorten UUID
+export function formatId(id: string) {
+  return `..${id.substring(id.length - 6)}`;
+}
+
+// Format date and time
+export function formatDateTime(dateString: Date) {
+  const dateTimeOptions: Intl.DateTimeFormatOptions = {
+    month: "short",
+    year: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  };
+
+  const dateOptions: Intl.DateTimeFormatOptions = {
+    weekday: "short",
+    month: "short",
+    year: "numeric",
+    day: "numeric",
+  };
+
+  const timeOptions: Intl.DateTimeFormatOptions = {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  };
+
+  const date = new Date(dateString);
+  const formattedDateTime = date.toLocaleString("en-US", dateTimeOptions);
+  const formattedDate = date.toLocaleDateString("en-US", dateOptions);
+  const formattedTime = date.toLocaleTimeString("en-US", timeOptions);
+
+  return { formattedDateTime, formattedDate, formattedTime };
+}

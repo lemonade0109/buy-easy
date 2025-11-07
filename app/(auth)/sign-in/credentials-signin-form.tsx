@@ -6,13 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signInDefaultValues } from "@/lib/constants";
-import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { signInUserWithCredentials } from "@/lib/actions/users/user-actions";
 import { useSearchParams } from "next/navigation";
 
 const CredentialsSignInForm = () => {
-  const [data, action] = useActionState(signInUserWithCredentials, {
+  const [data, action] = React.useActionState(signInUserWithCredentials, {
     success: false,
     message: "",
   });

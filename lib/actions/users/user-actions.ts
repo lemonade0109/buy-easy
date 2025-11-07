@@ -1,5 +1,6 @@
 "use server";
 import {
+  paymentMethodSchema,
   shippingAddressSchema,
   userSignInSchema,
   userSignUpSchema,
@@ -12,22 +13,23 @@ import { prisma } from "@/db/prisma";
 import { renderError } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
 import { ShippingAddress } from "@/types";
+import z from "zod";
 
 // Check if email exists
-export async function emailExists(email: string): Promise<boolean> {
+export const emailExists = async (email: string): Promise<boolean> => {
   const user = await prisma.user.findFirst({
     where: { email: { equals: email, mode: "insensitive" } },
     select: { id: true },
   });
 
   return !!user;
-}
+};
 
 // Action to sign in user with credentials
-export async function signInUserWithCredentials(
+export const signInUserWithCredentials = async (
   prevState: unknown,
   formData: FormData
-) {
+) => {
   try {
     const rawData = Object.fromEntries(formData);
     const callbackUrl = (rawData.callbackUrl as string) || "/";
@@ -51,10 +53,10 @@ export async function signInUserWithCredentials(
 
     return { success: false, ...renderError(message) };
   }
-}
+};
 
 // Action to sign up user
-export async function signUpUser(prevState: unknown, formData: FormData) {
+export const signUpUser = async (prevState: unknown, formData: FormData) => {
   try {
     const rawData = Object.fromEntries(formData);
     const callbackUrl = (rawData.callbackUrl as string) || "/";
@@ -97,15 +99,15 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
     return { success: false, ...renderError(error) };
   }
-}
+};
 
 // Action to sign out user
-export async function signOutUser() {
+export const signOutUser = async () => {
   await signOut({ redirect: true, redirectTo: "/" });
-}
+};
 
 // Get user by ID
-export async function getUserById(userId: string) {
+export const getUserById = async (userId: string) => {
   const user = await prisma.user.findFirst({
     where: { id: userId },
   });
@@ -113,7 +115,7 @@ export async function getUserById(userId: string) {
   if (!user) throw new Error("User not found");
 
   return user;
-}
+};
 
 // Update user address
 export const updateUserAddress = async (data: ShippingAddress) => {
@@ -133,6 +135,40 @@ export const updateUserAddress = async (data: ShippingAddress) => {
     });
 
     return { success: true, message: "User address updated successfully" };
+  } catch (error) {
+    return {
+      success: false,
+      ...renderError(error),
+    };
+  }
+};
+
+// Update user payment method
+export const updateUserPaymentMethod = async (
+  data: z.infer<typeof paymentMethodSchema>
+) => {
+  try {
+    const session = await auth();
+    const currentUser = await prisma.user.findFirst({
+      where: { id: session?.user?.id },
+    });
+
+    if (!currentUser) throw new Error("User not found");
+
+    const validatedPaymentMethod = validateWithZodSchema(
+      paymentMethodSchema,
+      data
+    );
+
+    await prisma.user.update({
+      where: { id: currentUser.id },
+      data: { paymentMethod: validatedPaymentMethod.type },
+    });
+
+    return {
+      success: true,
+      message: "User payment method updated successfully",
+    };
   } catch (error) {
     return {
       success: false,

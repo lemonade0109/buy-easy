@@ -26,3 +26,14 @@ export const shippingAddressDefaultValues = {
   country: " ",
   phone: " ",
 };
+
+export const PAYMENT_METHODS = process.env.NEXT_PUBLIC_PAYMENT_METHODS
+  ? process.env.NEXT_PUBLIC_PAYMENT_METHODS.split(",").map((method) =>
+      method.trim()
+    )
+  : ["PayPal", "Stripe", "Cash on Delivery"];
+
+export const DEFAULT_PAYMENT_METHOD =
+  process.env.NEXT_PUBLIC_DEFAULT_PAYMENT_METHOD ??
+  process.env.DEFAULT_PAYMENT_METHOD ??
+  "PayPal";

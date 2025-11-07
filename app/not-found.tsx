@@ -16,7 +16,7 @@ export default function NotFoundPage() {
       />
       <div className="p-6 rounded-lg shadow-md text-center w-1/3">
         <h2 className="text-lg font-bold mb-2">Page Not Found</h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-red-600">
           We&apos;re sorry, but the page you were looking for could not be
           found.
         </p>
