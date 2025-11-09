@@ -1,0 +1,19 @@
+FAIL tests/paypal.test.ts
+  ● Test suite failed to run
+
+    Cannot find module '@/lib/paypal' from 'tests/paypal.test.ts'
+
+    [0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { generateAccessToken } [36mfrom[39m [32m"@/lib/paypal"[39m[33m;[39m
+     [90m   |[39m [31m[1m^[22m[39m
+     [90m 2 |[39m
+     [90m 3 |[39m [90m// Test to verify PayPal access token generation[39m
+     [90m 4 |[39m describe([32m"PayPal API"[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/index.js:863:11)
+      at Object.<anonymous> (tests/paypal.test.ts:1:1)
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        1.44 s
+Ran all test suites.

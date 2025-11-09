@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Loader } from "lucide-react";
 import { updateUserAddress } from "@/lib/actions/users/user-actions";
 import toast from "react-hot-toast";
+import { asStringMessage } from "@/lib/utils";
 
 const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
   const router = useRouter();
@@ -38,7 +39,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
     startTransition(async () => {
       const res = await updateUserAddress(data);
       if (!res.success) {
-        toast.error(res.message);
+        toast.error(asStringMessage((res as { message?: unknown }).message));
       }
 
       router.push("/payment-method");

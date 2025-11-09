@@ -123,7 +123,7 @@ export async function addToCart(data: CartItem) {
   } catch (error) {
     return {
       success: false,
-      ...renderError(error),
+      message: renderError(error),
     };
   }
 }
@@ -209,7 +209,7 @@ export async function removeFromCart(productId: string) {
   } catch (error) {
     return {
       success: false,
-      ...renderError(error),
+      message: renderError(error),
     };
   }
 }

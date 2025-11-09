@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signUpUser } from "@/lib/actions/users/user-actions";
 import { signUpDefaultValues } from "@/lib/constants";
+import { asStringMessage } from "@/lib/utils";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -84,7 +85,9 @@ const SignUpForm = () => {
       </div>
 
       {data && !data.success && (
-        <div className="text-center text-destructive">{data.message}</div>
+        <div className="text-center text-destructive">
+          {asStringMessage((data as { message?: unknown }).message)}
+        </div>
       )}
 
       <div className="text-sm text-center text-muted-foreground">

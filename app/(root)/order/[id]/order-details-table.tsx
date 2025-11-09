@@ -12,10 +12,16 @@ import { formatCurrency, formatDateTime, formatId } from "@/lib/utils";
 import { Order } from "@/types";
 import NextLink from "next/link";
 import Image from "next/image";
-
 import React from "react";
+import PayPalButtonsComponent from "@/components/paypal/paypal-button";
 
-const OrderDetailsTable = ({ order }: { order: Order }) => {
+const OrderDetailsTable = ({
+  order,
+  paypalClientId,
+}: {
+  order: Order;
+  paypalClientId: string;
+}) => {
   const {
     id,
     shippingAddress,
@@ -45,8 +51,6 @@ const OrderDetailsTable = ({ order }: { order: Order }) => {
         return null;
     }
   };
-
-  console.log(orderitems);
 
   return (
     <>
@@ -157,6 +161,14 @@ const OrderDetailsTable = ({ order }: { order: Order }) => {
                 <div>Total</div>
                 <div>{formatCurrency(totalPrice)}</div>
               </div>
+
+              {/*  PayPal Payment Section */}
+              {!isPaid && paymentMethod === "PayPal" && (
+                <PayPalButtonsComponent
+                  orderId={order.id}
+                  paypalClientId={paypalClientId}
+                />
+              )}
             </CardContent>
           </Card>
         </div>

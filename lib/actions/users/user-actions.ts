@@ -51,7 +51,10 @@ export const signInUserWithCredentials = async (
         ? error.message
         : "Incorrect username or password";
 
-    return { success: false, ...renderError(message) };
+    return {
+      success: false,
+      message: renderError(error),
+    };
   }
 };
 
@@ -97,7 +100,10 @@ export const signUpUser = async (prevState: unknown, formData: FormData) => {
       return { success: false, message: "Email already in use" };
     }
 
-    return { success: false, ...renderError(error) };
+    return {
+      success: false,
+      message: renderError(error),
+    };
   }
 };
 
@@ -138,7 +144,7 @@ export const updateUserAddress = async (data: ShippingAddress) => {
   } catch (error) {
     return {
       success: false,
-      ...renderError(error),
+      message: renderError(error),
     };
   }
 };
@@ -172,7 +178,7 @@ export const updateUserPaymentMethod = async (
   } catch (error) {
     return {
       success: false,
-      ...renderError(error),
+      message: renderError(error) as unknown as string,
     };
   }
 };

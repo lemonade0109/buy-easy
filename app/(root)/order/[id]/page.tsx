@@ -33,6 +33,7 @@ export default async function OrderDetailsPage(props: {
           ...order,
           shippingAddress: order.shippingAddress as ShippingAddress,
         }}
+        paypalClientId={process.env.PAYPAL_CLIENT_ID || "sb"}
       />
     </>
   );

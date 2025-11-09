@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-hot-toast";
+import { asStringMessage } from "@/lib/utils";
 import { Cart, CartItem } from "@/types";
 import { Plus, Minus, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -18,7 +19,7 @@ const AddToCart = ({ item, cart }: { item: CartItem; cart?: Cart }) => {
     startTransition(async () => {
       const res = await addToCart(item);
       if (!res.success) {
-        toast.error(res.message);
+        toast.error(asStringMessage((res as { message?: unknown }).message));
       }
 
       // Handle success add to cart
@@ -26,7 +27,9 @@ const AddToCart = ({ item, cart }: { item: CartItem; cart?: Cart }) => {
         toast.custom((t) => (
           <CartToast
             t={t}
-            description={res.message}
+            description={asStringMessage(
+              (res as { message?: unknown }).message
+            )}
             onViewCart={() => {
               router.push("/cart");
             }}
@@ -41,14 +44,16 @@ const AddToCart = ({ item, cart }: { item: CartItem; cart?: Cart }) => {
     startTransition(async () => {
       const res = await removeFromCart(item.productId);
       if (!res.success) {
-        toast.error(res.message);
+        toast.error(asStringMessage((res as { message?: unknown }).message));
       }
       // Handle success remove from cart
       if (res.success) {
         toast.custom((t) => (
           <CartToast
             t={t}
-            description={res.message}
+            description={asStringMessage(
+              (res as { message?: unknown }).message
+            )}
             onViewCart={() => {
               router.push("/cart");
             }}

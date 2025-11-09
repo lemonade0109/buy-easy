@@ -24,6 +24,20 @@ export function renderError(error: any): { message: string } {
   };
 }
 
+// Normalize different error shapes into a plain string message
+export function asStringMessage(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (!value) return "An error occurred";
+  if (value instanceof Error) return value.message;
+  try {
+    const v = value as { message?: unknown };
+    if (v && typeof v.message === "string") return v.message;
+    return String(value);
+  } catch {
+    return "An error occurred";
+  }
+}
+
 // Round num to 2 decimal places
 export function roundToTwoDecimalPlaces(val: number | string) {
   if (typeof val === "number") {

@@ -3,6 +3,7 @@ import { Cart } from "@/types";
 import React from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { asStringMessage } from "@/lib/utils";
 import Link from "next/link";
 import { removeFromCart, addToCart } from "@/lib/actions/cart/cart-actions";
 import { ArrowRight, Loader, Minus, Plus } from "lucide-react";
@@ -73,7 +74,9 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
 
                             if (!res.success) {
                               toast.error(
-                                res.message || "Error removing item from cart"
+                                asStringMessage(
+                                  (res as { message?: unknown }).message
+                                ) || "Error removing item from cart"
                               );
                             }
                           });
@@ -98,7 +101,9 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
 
                             if (!res.success) {
                               toast.error(
-                                res.message || "Error adding item to cart"
+                                asStringMessage(
+                                  (res as { message?: unknown }).message
+                                ) || "Error adding item to cart"
                               );
                             }
                           });
