@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import qs from "query-string";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -15,13 +16,23 @@ export function formatNumberWithDecimal(num: number): string {
   const [int, decimal] = num.toString().split(".");
   return decimal ? `${int}.${decimal.padEnd(2, "0")}` : `${int}.00`;
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function renderError(error: any): { message: string } {
+export function renderError(error: unknown): { message: string } {
   console.log(error);
 
-  return {
-    message: error instanceof Error ? error.message : "An error occurred",
-  };
+  if (error instanceof Error) {
+    return { message: error.message };
+  }
+
+  try {
+    const maybe = error as { message?: unknown };
+    if (maybe && typeof maybe.message === "string") {
+      return { message: maybe.message };
+    }
+  } catch {
+    // ignore
+  }
+
+  return { message: "An error occurred" };
 }
 
 // Normalize different error shapes into a plain string message
@@ -101,4 +112,26 @@ export function formatDateTime(dateString: Date) {
   const formattedTime = date.toLocaleTimeString("en-US", timeOptions);
 
   return { formattedDateTime, formattedDate, formattedTime };
+}
+
+// Form the pagination links
+export function formUrlQueryString({
+  params,
+  key,
+  value,
+}: {
+  params: string;
+  key: string;
+  value: string | null;
+}) {
+  const query = qs.parse(params);
+  query[key] = value;
+
+  return qs.stringifyUrl(
+    {
+      url: window.location.pathname,
+      query,
+    },
+    { skipNull: true }
+  );
 }

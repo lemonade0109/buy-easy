@@ -37,3 +37,6 @@ export const DEFAULT_PAYMENT_METHOD =
   process.env.NEXT_PUBLIC_DEFAULT_PAYMENT_METHOD ??
   process.env.DEFAULT_PAYMENT_METHOD ??
   "PayPal";
+
+export const ORDER_ITEMS_PER_PAGE =
+  Number(process.env.NEXT_PUBLIC_ORDER_ITEMS_PER_PAGE) || 12;

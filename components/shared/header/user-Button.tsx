@@ -45,14 +45,35 @@ const UserButton = async () => {
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <div className="text-sm font-medium leading-none">
+              <div className="text-sm font-medium leading-none ml-2">
                 {session?.user?.name}
               </div>
-              <div className="text-muted-foreground leading-none">
+              <div className="text-muted-foreground leading-none ml-2">
                 {session?.user?.email}
               </div>
             </div>
           </DropdownMenuLabel>
+
+          <DropdownMenuItem>
+            <Link href="/user/profile" className="w-full ml-2">
+              User Profile
+            </Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem>
+            <Link href="/user/orders" className="w-full ml-2">
+              Order History
+            </Link>
+          </DropdownMenuItem>
+
+          {session.user.role === "admin" && (
+            <DropdownMenuItem>
+              <Link href="/admin/overview" className="w-full ml-2">
+                Admin
+              </Link>
+            </DropdownMenuItem>
+          )}
+
           <DropdownMenuItem className="p-0 mb-1">
             <form action={signOutUser} className="w-full">
               <Button

@@ -3,7 +3,6 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/db/prisma";
 import { compareSync } from "bcrypt-ts-edge";
-import { cookies } from "next/headers";
 import Credentials from "next-auth/providers/credentials";
 import { mergeSessionCartToUser } from "./lib/actions/cart/merge-session-carts";
 
@@ -33,10 +32,25 @@ export const {
       authorize: async (credentials) => {
         if (!credentials?.email || !credentials?.password) return null;
 
-        //Find user in database
+        // Normalize incoming email and find user in database (case-insensitive)
+        const lookupEmail = String(credentials.email).trim();
         const user = await prisma.user.findFirst({
-          where: { email: credentials.email },
+          where: { email: { equals: lookupEmail, mode: "insensitive" } },
         });
+        // Debug logs for credentials sign-in flow. These are safe (don't log raw passwords).
+        try {
+          console.debug(
+            "[auth] credentials.authorize - email:",
+            credentials.email
+          );
+          console.debug(
+            "[auth] credentials.authorize - user found:",
+            !!user,
+            user?.id
+          );
+        } catch (e) {
+          // ignore logging errors in production
+        }
         if (!user || !user.password) return null;
 
         // Ensure values are strings for compareSync
@@ -44,7 +58,14 @@ export const {
         const hashedPassword = String(user.password);
 
         // Check if Password matches
-        if (!compareSync(plainPassword, hashedPassword)) return null;
+        const isMatch = compareSync(plainPassword, hashedPassword);
+        try {
+          console.debug(
+            "[auth] credentials.authorize - password match:",
+            isMatch
+          );
+        } catch (e) {}
+        if (!isMatch) return null;
 
         return {
           id: user.id,
@@ -60,9 +81,14 @@ export const {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub as string;
-        //eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (session.user as any).role = (token as any).role;
-        session.user.name = token.name as string;
+        // Narrow token shape without using `any`
+        type TokenWithRole = { role?: string; name?: string } & Record<
+          string,
+          unknown
+        >;
+        const t = token as TokenWithRole;
+        (session.user as { role?: string }).role = t.role;
+        session.user.name = t.name as string;
       }
       return session;
     },
@@ -91,6 +117,7 @@ export const {
             await mergeSessionCartToUser(user.id);
           }
         }
+
         // allow username updates
         if (trigger === "update" && session?.user.name) {
           token.name = session.user.name;

@@ -2,6 +2,7 @@
 import {
   paymentMethodSchema,
   shippingAddressSchema,
+  updateUserProfileSchema,
   userSignInSchema,
   userSignUpSchema,
   validateWithZodSchema,
@@ -35,25 +36,59 @@ export const signInUserWithCredentials = async (
     const callbackUrl = (rawData.callbackUrl as string) || "/";
     const validatedData = validateWithZodSchema(userSignInSchema, rawData);
 
-    await signIn("credentials", {
+    // Check if user exists first to avoid Auth.js throwing CredentialsSignin
+    const lookupEmail = String(validatedData.email).trim();
+    const existingUser = await prisma.user.findFirst({
+      where: { email: { equals: lookupEmail, mode: "insensitive" } },
+      select: { id: true },
+    });
+
+    if (!existingUser) {
+      return { success: false, message: "User not found" };
+    }
+
+    // Use redirect: false so we can handle errors returned by signIn and
+
+    const res = await signIn("credentials", {
       ...validatedData,
       redirect: true,
-      redirectTo: callbackUrl,
+      callbackUrl,
     });
+
+    // `signIn` may return an object with `error` or `url` depending on outcome.
+    try {
+      // eslint-disable-next-line no-console
+      console.debug("[auth] signIn raw result type:", typeof res);
+      // eslint-disable-next-line no-console
+      console.debug("[auth] signIn raw result:", res);
+    } catch (e) {}
+    type SignInResult =
+      | { error?: string; url?: string; ok?: boolean }
+      | undefined
+      | null;
+    if (res && typeof res === "object") {
+      const r = res as SignInResult;
+      if (r && r.error) {
+        return { success: false, message: String(r.error) };
+      }
+      if (r && r.url) {
+        return {
+          success: true,
+          message: "Signed in successfully",
+          data: r.url,
+        };
+      }
+    }
+
     return { success: true, message: "Signed in successfully" };
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
     }
 
-    const message =
-      error instanceof Error && error.message
-        ? error.message
-        : "Incorrect username or password";
-
     return {
       success: false,
-      message: renderError(error),
+      message: "Incorrect username or password",
     };
   }
 };
@@ -84,7 +119,7 @@ export const signUpUser = async (prevState: unknown, formData: FormData) => {
       email: validatedData.email,
       password: plainPassword,
       redirect: true,
-      redirectTo: callbackUrl,
+      callbackUrl,
     });
 
     return { success: true, message: "User created successfully" };
@@ -179,6 +214,41 @@ export const updateUserPaymentMethod = async (
     return {
       success: false,
       message: renderError(error) as unknown as string,
+    };
+  }
+};
+
+// Update the user profile
+export const updateUserProfile = async (data: {
+  name: string;
+  email: string;
+}) => {
+  try {
+    const session = await auth();
+    const currentUser = await prisma.user.findFirst({
+      where: { id: session?.user?.id },
+    });
+
+    if (!currentUser) throw new Error("User not found");
+    const validatedProfileData = validateWithZodSchema(
+      updateUserProfileSchema,
+      data
+    );
+    await prisma.user.update({
+      where: { id: currentUser.id },
+      data: {
+        name: validatedProfileData.name,
+      },
+    });
+
+    return {
+      success: true,
+      message: "User profile updated successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: renderError(error),
     };
   }
 };

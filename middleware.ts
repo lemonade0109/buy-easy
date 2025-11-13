@@ -23,9 +23,11 @@ export default auth((req) => {
   // If missing, generate an id and attach it to the default response.
   if (!existingSessionCart) {
     const id =
-      //eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (globalThis as any).crypto?.randomUUID?.() ??
-      Math.random().toString(36).slice(2, 10);
+      // Prefer the Web Crypto API when available. Narrow the globalThis type
+      // via `unknown` to avoid `any` usage.
+      (
+        globalThis as unknown as { crypto?: { randomUUID?: () => string } }
+      ).crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2, 10);
     defaultRes.cookies.set({
       name: "session_cartId",
       value: id,
