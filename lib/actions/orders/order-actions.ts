@@ -1,7 +1,11 @@
 "use server";
 
 import { auth } from "@/auth";
-import { convertToPlainObject, renderError } from "@/lib/utils";
+import {
+  convertToPlainObject,
+  decimalToNumber,
+  renderError,
+} from "@/lib/utils";
 import type { Order as OrderType, PaymentResult } from "@/types";
 import { getCartItems } from "../cart/cart-actions";
 import { getUserById } from "../users/user-actions";
@@ -220,7 +224,6 @@ export const approvePayPalOrder = async (
       throw new Error("Error in paypal payment");
     }
     // Update order to paid in DB
-    // todo
     await updateOrderToPaid(orderId, {
       orderId: data.orderID,
       paymentResult: {
@@ -249,9 +252,9 @@ export const approvePayPalOrder = async (
 // update order to paid
 const updateOrderToPaid = async (
   orderId: string,
-  paymentResult: {
+  paymentResult?: {
     orderId: string;
-    paymentResult: PaymentResult;
+    paymentResult?: PaymentResult;
   }
 ) => {
   // Get order from DB
@@ -330,6 +333,14 @@ type SalesDataType = {
   totalSales: number;
 }[];
 
+// Raw row returned by prisma.$queryRaw for monthly sales. Different DB adapters
+// may return the alias with different casing, so accept both.
+type SalesRow = {
+  month: string;
+  totalSales?: Prisma.Decimal | null;
+  totalsales?: Prisma.Decimal | null;
+};
+
 // Get sales data and order summary
 export async function getOrderSummary() {
   // Get counts for each resource
@@ -344,18 +355,28 @@ export async function getOrderSummary() {
 
   // Get monthly sales
   const salesDataRaw = await prisma.$queryRaw<
-    Array<{ month: string; totalSales: Prisma.Decimal }>
+    Array<{
+      month: string;
+      // some DB drivers/libraries return the alias lower-cased; accept both
+      totalSales?: Prisma.Decimal;
+      totalsales?: Prisma.Decimal;
+    }>
   >`
-    SELECT to_char("createdAt", 'MM/YY') as "month", 
-    sum("totalPrice") as totalSales
-    FROM "Order" 
+    SELECT to_char("createdAt", 'MM/YY') as "month",
+    sum("totalPrice") as "totalSales"
+    FROM "orders"
     GROUP BY to_char("createdAt", 'MM/YY')
   `;
 
-  const salesData: SalesDataType = salesDataRaw.map((entry) => ({
-    month: entry.month,
-    totalSales: Number(entry.totalSales),
-  }));
+  const getRawTotal = (entry: SalesRow) => entry.totalSales ?? entry.totalsales;
+
+  const salesData: SalesDataType = (salesDataRaw as SalesRow[]).map((entry) => {
+    const rawValue = getRawTotal(entry);
+    return {
+      month: entry.month,
+      totalSales: decimalToNumber(rawValue),
+    };
+  });
 
   // Get latest sales
   const latestOrders = await prisma.order.findMany({
@@ -369,5 +390,94 @@ export async function getOrderSummary() {
     usersCount,
     totalSales,
     latestOrders,
+    salesData,
   };
 }
+
+// Get all orders
+export const getAllOrders = async ({
+  limit = ORDER_ITEMS_PER_PAGE,
+  page,
+}: {
+  limit?: number;
+  page?: number;
+}) => {
+  const data = await prisma.order.findMany({
+    orderBy: { createdAt: "desc" },
+    skip: page && limit ? (page - 1) * limit : undefined,
+    take: limit,
+    include: { user: { select: { name: true } } },
+  });
+
+  const dataCount = await prisma.order.count();
+
+  return { data, totalPages: Math.ceil(dataCount / limit) };
+};
+
+// Delete an order
+export const deleteOrder = async (id: string) => {
+  try {
+    await prisma.order.delete({ where: { id } });
+
+    revalidatePath("/admin/orders");
+
+    return {
+      success: true,
+      message: "Order deleted successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: renderError(error),
+    };
+  }
+};
+
+// Update COD order to paid
+export const updateOrderToPaidCOD = async (orderId: string) => {
+  try {
+    await updateOrderToPaid(orderId);
+
+    revalidatePath(`/order/${orderId}`);
+
+    return {
+      success: true,
+      message: "Order marked as paid",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: renderError(error),
+    };
+  }
+};
+
+// Update order to delivered
+export const deliverOrder = async (orderId: string) => {
+  try {
+    const order = await prisma.order.findFirst({
+      where: { id: orderId },
+    });
+    if (!order) throw new Error("Order not found");
+    if (!order.isPaid) throw new Error("Order is not paid yet");
+
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        isDelivered: true,
+        deliveredAt: new Date(),
+      },
+    });
+    revalidatePath(`/order/${orderId}`);
+
+    return {
+      success: true,
+      message: "Order marked as delivered",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: renderError(error),
+    };
+  }
+};

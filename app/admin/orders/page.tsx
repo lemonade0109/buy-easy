@@ -1,5 +1,7 @@
-import Pagination from "@/components/shared/pagination";
-import { Button } from "@/components/ui/button";
+import React from "react";
+import { Metadata } from "next";
+import { deleteOrder, getAllOrders } from "@/lib/actions/orders/order-actions";
+import { auth } from "@/auth";
 import {
   Table,
   TableBody,
@@ -8,23 +10,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getUserOrders } from "@/lib/actions/orders/order-actions";
 import { formatCurrency, formatDateTime, formatId } from "@/lib/utils";
-import { Metadata } from "next";
 import Link from "next/link";
-import React from "react";
+import Pagination from "@/components/shared/pagination";
+import { Button } from "@/components/ui/button";
+import DeleteDialog from "@/components/shared/delete-dialog";
 
 export const metadata: Metadata = {
-  title: "Your Orders",
+  title: "Admin Orders",
+  description: "Manage all orders in the admin panel",
 };
 
-export default async function OrdersPage(props: {
-  searchParams: Promise<{ page: string }>;
+export default async function AdminOrderPage(props: {
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const { page } = await props.searchParams;
+  const { page = "1" } = await props.searchParams;
+  const session = await auth();
 
-  const orders = await getUserOrders({
-    page: Number(page) || 1,
+  if (session?.user?.role !== "admin") {
+    throw new Error("Unauthorized");
+  }
+
+  const orders = await getAllOrders({
+    page: Number(page),
   });
 
   return (
@@ -63,10 +71,11 @@ export default async function OrdersPage(props: {
                     ? formatDateTime(order.deliveredAt).formattedDateTime
                     : "Not Delivered"}
                 </TableCell>
-                <TableCell>
+                <TableCell className="flex">
                   <Button variant="outline" size="sm" asChild>
                     <Link href={`/order/${order.id}`}>Details</Link>
                   </Button>
+                  <DeleteDialog id={order.id} action={deleteOrder} />
                 </TableCell>
               </TableRow>
             ))}

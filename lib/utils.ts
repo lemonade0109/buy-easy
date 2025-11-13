@@ -16,6 +16,8 @@ export function formatNumberWithDecimal(num: number): string {
   const [int, decimal] = num.toString().split(".");
   return decimal ? `${int}.${decimal.padEnd(2, "0")}` : `${int}.00`;
 }
+
+// Render error message from different error shapes
 export function renderError(error: unknown): { message: string } {
   console.log(error);
 
@@ -77,6 +79,13 @@ export function formatCurrency(amount: number | string | null) {
   }
 }
 
+// Format Number
+const NUMBER_FORMATTER = new Intl.NumberFormat("en-US");
+
+export function formatNumber(number: number) {
+  return NUMBER_FORMATTER.format(number);
+}
+
 // Shorten UUID
 export function formatId(id: string) {
   return `..${id.substring(id.length - 6)}`;
@@ -135,3 +144,27 @@ export function formUrlQueryString({
     { skipNull: true }
   );
 }
+
+// Safely convert Prisma.Decimal (or other shapes) to a JS number
+export const decimalToNumber = (val: unknown): number => {
+  if (val === null || val === undefined) return 0;
+  if (typeof val === "number") return val;
+  if (typeof val === "string") {
+    const n = Number(val);
+    return Number.isFinite(n) ? n : 0;
+  }
+  try {
+    const v = val as { toNumber?: () => number; toString?: () => string };
+    if (typeof v.toNumber === "function") {
+      const n = v.toNumber();
+      return Number.isFinite(n) ? n : 0;
+    }
+    if (typeof v.toString === "function") {
+      const n = Number(v.toString());
+      return Number.isFinite(n) ? n : 0;
+    }
+  } catch (e) {
+    // fallthrough
+  }
+  return 0;
+};

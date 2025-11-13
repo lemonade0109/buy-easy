@@ -4,6 +4,7 @@ import { getOrderById } from "@/lib/actions/orders/order-actions";
 import { notFound } from "next/navigation";
 import OrderDetailsTable from "./order-details-table";
 import { ShippingAddress } from "@/types";
+import { auth } from "@/auth";
 
 export const metadata: Metadata = {
   title: "Order Details",
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 export default async function OrderDetailsPage(props: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await auth();
   const { id } = await props.params;
 
   const result = await getOrderById(id);
@@ -34,6 +36,7 @@ export default async function OrderDetailsPage(props: {
           shippingAddress: order.shippingAddress as ShippingAddress,
         }}
         paypalClientId={process.env.PAYPAL_CLIENT_ID || "sb"}
+        isAdmin={session?.user?.role === "admin" || false}
       />
     </>
   );

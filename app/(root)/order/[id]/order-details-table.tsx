@@ -14,13 +14,17 @@ import NextLink from "next/link";
 import Image from "next/image";
 import React from "react";
 import PayPalButtonsComponent from "@/components/paypal/paypal-button";
+import MarkAsPaidButton from "@/components/admin/mark-as-paid-button";
+import MarkAsDeliveredButton from "@/components/admin/mark-as-delivered-button";
 
 const OrderDetailsTable = ({
   order,
   paypalClientId,
+  isAdmin,
 }: {
   order: Order;
   paypalClientId: string;
+  isAdmin: boolean;
 }) => {
   const {
     id,
@@ -168,6 +172,15 @@ const OrderDetailsTable = ({
                   orderId={order.id}
                   paypalClientId={paypalClientId}
                 />
+              )}
+
+              {/* Cash on Delivery Section */}
+              {isAdmin && !isPaid && paymentMethod === "Cash on Delivery" && (
+                <MarkAsPaidButton orderId={order.id} />
+              )}
+
+              {isAdmin && isPaid && !isDelivered && (
+                <MarkAsDeliveredButton orderId={order.id} />
               )}
             </CardContent>
           </Card>
