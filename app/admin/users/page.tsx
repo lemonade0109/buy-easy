@@ -10,9 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAllUsers } from "@/lib/actions/users/user-actions";
+import { deleteUser, getAllUsers } from "@/lib/actions/users/user-actions";
 import { requireAdmin } from "@/lib/auth-guard";
-import { formatCurrency, formatDateTime, formatId } from "@/lib/utils";
+import { formatId } from "@/lib/utils";
 import { Metadata } from "next";
 import Link from "next/link";
 import React from "react";
@@ -23,18 +23,31 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminUserPage(props: {
-  searchParams: Promise<{ page: string }>;
+  searchParams: Promise<{ page: string; query: string }>;
 }) {
   await requireAdmin();
 
   const searchParams = await props.searchParams;
   const page = Number(searchParams.page) || 1;
+  const searchText = searchParams.query;
 
-  const users = await getAllUsers({ page });
+  const users = await getAllUsers({ page, query: searchText });
   return (
     <>
       <div className="space-y-2">
-        <h2 className="h2-bold">Users</h2>
+        <div className="flex items-center gap-2">
+          <h1 className="font-bold text-2xl">Users</h1>
+          {searchText && (
+            <div className=" space-x-2 flex items-center">
+              Filtered by <i>&quot;{searchText}&quot;</i>
+              <Link href="/admin/users">
+                <Button variant="outline" size="sm">
+                  Clear Filter
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
         <Table>
           <TableHeader>
             <TableRow>
@@ -60,12 +73,12 @@ export default async function AdminUserPage(props: {
                   )}
                 </TableCell>
 
-                <TableCell className="flex">
+                <TableCell className="flex items-center gap-2">
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`admin//user/${user.id}`}>Edit</Link>
+                    <Link href={`/admin//users/${user.id}`}>Edit</Link>
                   </Button>
 
-                  {/* <DeleteDialog id={user.id} action={deleteUser} /> */}
+                  <DeleteDialog id={user.id} action={deleteUser} />
                 </TableCell>
               </TableRow>
             ))}

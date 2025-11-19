@@ -3,6 +3,7 @@ import {
   paymentMethodSchema,
   shippingAddressSchema,
   updateUserProfileSchema,
+  updateUserSchema,
   userSignInSchema,
   userSignUpSchema,
   validateWithZodSchema,
@@ -16,6 +17,7 @@ import { Prisma } from "@prisma/client";
 import { ShippingAddress } from "@/types";
 import z from "zod";
 import { ORDER_ITEMS_PER_PAGE } from "@/lib/constants";
+import { revalidatePath } from "next/cache";
 
 // Check if email exists
 export const emailExists = async (email: string): Promise<boolean> => {
@@ -258,11 +260,23 @@ export const updateUserProfile = async (data: {
 export const getAllUsers = async ({
   limit = ORDER_ITEMS_PER_PAGE,
   page,
+  query,
 }: {
   limit?: number;
-  page?: number;
+  page: number;
+  query: string;
 }) => {
+  const queryFilter: Prisma.UserWhereInput =
+    query && query.trim() !== "all"
+      ? {
+          name: { contains: query, mode: "insensitive" } as Prisma.StringFilter,
+        }
+      : {};
+
   const data = await prisma.user.findMany({
+    where: {
+      ...queryFilter,
+    },
     take: limit,
     skip: page && limit ? (page - 1) * limit : 0,
     orderBy: { createdAt: "desc" },
@@ -270,4 +284,45 @@ export const getAllUsers = async ({
 
   const dataCount = await prisma.user.count();
   return { data, totalPages: Math.ceil(dataCount / limit) };
+};
+
+// Delete user
+export const deleteUser = async (userId: string) => {
+  try {
+    await prisma.user.delete({ where: { id: userId } });
+
+    revalidatePath("/admin/users");
+    return {
+      success: true,
+      message: "User deleted successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: renderError(error),
+    };
+  }
+};
+
+// Update user
+export const updateUser = async (user: z.infer<typeof updateUserSchema>) => {
+  try {
+    const validatedUserData = validateWithZodSchema(updateUserSchema, user);
+    await prisma.user.update({
+      where: { id: validatedUserData.id },
+      data: {
+        ...validatedUserData,
+      },
+    });
+    revalidatePath("/admin/users");
+    return {
+      success: true,
+      message: "User updated successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: renderError(error),
+    };
+  }
 };

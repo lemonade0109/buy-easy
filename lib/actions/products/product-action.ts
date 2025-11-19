@@ -9,6 +9,7 @@ import {
   validateWithZodSchema,
 } from "@/lib/validator";
 import { Product } from "@/types";
+import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import z from "zod";
 
@@ -75,7 +76,26 @@ export const getAllProducts = async ({
   page: number;
   category?: string;
 }) => {
+  const queryFilter: Prisma.ProductWhereInput =
+    query && query.trim() !== "all"
+      ? {
+          OR: [
+            { name: { contains: query, mode: "insensitive" } },
+            {
+              description: { contains: query, mode: "insensitive" },
+            },
+          ],
+        }
+      : {};
+
+  if (category && category.trim() !== "all") {
+    queryFilter.category = category;
+  }
+
   const data = await prisma.product.findMany({
+    where: {
+      ...queryFilter,
+    },
     orderBy: { createdAt: "desc" },
     skip: (page - 1) * limit,
     take: limit,

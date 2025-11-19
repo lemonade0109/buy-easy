@@ -55,3 +55,7 @@ export const productDefaultValues = {
   banner: null,
   numReviews: "0",
 };
+
+export const USER_ROLES = process.env.USER_ROLES
+  ? process.env.USER_ROLES.split(", ").map((role) => role.trim())
+  : ["user", "admin"];

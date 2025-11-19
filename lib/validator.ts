@@ -158,3 +158,9 @@ export const updateUserProfileSchema = z.object({
     .string()
     .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"),
 });
+
+// Schema for updating users
+export const updateUserSchema = updateUserProfileSchema.extend({
+  id: z.string().min(1, " Id is required"),
+  role: z.string().min(1, "Role is required"),
+});
