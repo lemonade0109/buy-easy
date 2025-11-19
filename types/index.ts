@@ -9,15 +9,10 @@ import {
   paymentResultSchema,
 } from "../lib/validator";
 
-export type Product = Omit<
-  z.infer<typeof productSchema>,
-  "price" | "rating" | "stockCount"
-> & {
-  id: string;
-  price: string;
-  rating: string;
-  stockCount: number;
-  createdAt: Date;
+export type Product = z.infer<typeof productSchema> & {
+  id?: string;
+  rating?: string;
+  createdAt?: Date;
 };
 
 export type CartItem = z.infer<typeof cartItemSchema>;

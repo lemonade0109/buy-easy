@@ -40,3 +40,18 @@ export const DEFAULT_PAYMENT_METHOD =
 
 export const ORDER_ITEMS_PER_PAGE =
   Number(process.env.NEXT_PUBLIC_ORDER_ITEMS_PER_PAGE) || 12;
+
+export const productDefaultValues = {
+  name: "",
+  slug: "",
+  description: "",
+  category: "",
+  price: "0",
+  stockCount: 0,
+  isFeatured: false,
+  brand: "",
+  rating: "0",
+  image: [],
+  banner: null,
+  numReviews: "0",
+};

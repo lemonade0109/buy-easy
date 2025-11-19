@@ -32,7 +32,7 @@ const DeleteDialog = ({
       if (!res.success) {
         toast.error(asStringMessage((res as { message?: unknown }).message));
       } else {
-        toast.success(res.message as string);
+        toast.success(asStringMessage(res.message));
         setOpen(false);
       }
     });

@@ -15,6 +15,7 @@ import { renderError } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
 import { ShippingAddress } from "@/types";
 import z from "zod";
+import { ORDER_ITEMS_PER_PAGE } from "@/lib/constants";
 
 // Check if email exists
 export const emailExists = async (email: string): Promise<boolean> => {
@@ -251,4 +252,22 @@ export const updateUserProfile = async (data: {
       message: renderError(error),
     };
   }
+};
+
+// Get all users
+export const getAllUsers = async ({
+  limit = ORDER_ITEMS_PER_PAGE,
+  page,
+}: {
+  limit?: number;
+  page?: number;
+}) => {
+  const data = await prisma.user.findMany({
+    take: limit,
+    skip: page && limit ? (page - 1) * limit : 0,
+    orderBy: { createdAt: "desc" },
+  });
+
+  const dataCount = await prisma.user.count();
+  return { data, totalPages: Math.ceil(dataCount / limit) };
 };

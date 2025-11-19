@@ -32,7 +32,7 @@ const calcPrices = (items: CartItem[]) => {
   };
 };
 
-export async function addToCart(data: CartItem) {
+export const addToCart = async (data: CartItem) => {
   try {
     //Check for cart cookie
     const sessionCartId = (await cookies()).get("session_cartId")?.value;
@@ -126,9 +126,9 @@ export async function addToCart(data: CartItem) {
       message: renderError(error),
     };
   }
-}
+};
 
-export async function getCartItems() {
+export const getCartItems = async () => {
   //Check for cart cookie
   const sessionCartId = (await cookies()).get("session_cartId")?.value;
   if (!sessionCartId) {
@@ -153,9 +153,9 @@ export async function getCartItems() {
     taxPrice: cartItems.taxPrice.toString(),
     shippingPrice: cartItems.shippingPrice.toString(),
   });
-}
+};
 
-export async function removeFromCart(productId: string) {
+export const removeFromCart = async (productId: string) => {
   try {
     // Check for cart cookie
     const sessionCartId = (await cookies()).get("session_cartId")?.value;
@@ -212,4 +212,4 @@ export async function removeFromCart(productId: string) {
       message: renderError(error),
     };
   }
-}
+};
