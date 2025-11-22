@@ -71,7 +71,7 @@ export default async function AdminProductsPage(props: {
         <TableBody>
           {products.data.map((product) => (
             <TableRow key={product.id}>
-              <TableCell>{formatId(product.id)}</TableCell>
+              <TableCell>{formatId(product.id || "")}</TableCell>
               <TableCell>{product.name}</TableCell>
               <TableCell>
                 {formatCurrency(product.price as unknown as string | number)}
@@ -86,7 +86,7 @@ export default async function AdminProductsPage(props: {
                   <Link href={`/admin/products/${product.id}`}>Edit</Link>
                 </Button>
 
-                <DeleteDialog id={product.id} action={deleteProduct} />
+                <DeleteDialog id={product.id || ""} action={deleteProduct} />
               </TableCell>
             </TableRow>
           ))}

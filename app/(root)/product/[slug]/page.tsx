@@ -9,6 +9,9 @@ import ProductPrice from "@/components/shared/product/product-price";
 import ProductImages from "@/components/shared/product/product-images";
 import AddToCart from "@/components/shared/product/add-to-cart";
 import { getCartItems } from "@/lib/actions/cart/cart-actions";
+import ReviewList from "./review-list";
+import { auth } from "@/auth";
+import Rating from "@/components/shared/product/rating";
 
 export default async function ProductDetailsPage(props: {
   params: Promise<{ slug: string }>;
@@ -17,6 +20,9 @@ export default async function ProductDetailsPage(props: {
 
   const product = await getProductBySlug(slug);
   if (!product) notFound();
+
+  const session = await auth();
+  const userId = session?.user?.id;
 
   const cart = await getCartItems();
   return (
@@ -35,10 +41,8 @@ export default async function ProductDetailsPage(props: {
                 {product.brand} {product.category}
               </p>
               <h1 className="h3-bold">{product.name}</h1>
-              <p>
-                {product.rating} of {product.numReviews}
-              </p>
-
+              <Rating value={Number(product.rating) || 0} />
+              <p>{product.numReviews} Reviews</p>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-center">
                 <ProductPrice
                   value={Number(product.price)}
@@ -73,7 +77,7 @@ export default async function ProductDetailsPage(props: {
                     <Badge variant="destructive">Out of Stock</Badge>
                   )}
                 </div>
-                {product.stockCount > 0 && (
+                {product.stockCount > 0 && product.id && (
                   <AddToCart
                     cart={cart}
                     item={{
@@ -90,6 +94,15 @@ export default async function ProductDetailsPage(props: {
             </Card>
           </div>
         </div>
+      </section>
+
+      <section className="mt-10">
+        <span className="text-xl font-bold "> Customer Reviews</span>
+        <ReviewList
+          productId={product.id || ""}
+          userId={userId || ""}
+          productSlug={product.slug}
+        />
       </section>
     </>
   );

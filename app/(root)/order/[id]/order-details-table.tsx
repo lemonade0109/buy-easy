@@ -16,15 +16,18 @@ import React from "react";
 import PayPalButtonsComponent from "@/components/paypal/paypal-button";
 import MarkAsPaidButton from "@/components/admin/mark-as-paid-button";
 import MarkAsDeliveredButton from "@/components/admin/mark-as-delivered-button";
+import StripePayment from "@/components/stripe/stripe-payment";
 
 const OrderDetailsTable = ({
   order,
   paypalClientId,
   isAdmin,
+  stripeClientSecret,
 }: {
   order: Order;
   paypalClientId: string;
   isAdmin: boolean;
+  stripeClientSecret: string | null;
 }) => {
   const {
     id,
@@ -171,6 +174,15 @@ const OrderDetailsTable = ({
                 <PayPalButtonsComponent
                   orderId={order.id}
                   paypalClientId={paypalClientId}
+                />
+              )}
+
+              {/* Stripe Payment Section */}
+              {!isPaid && paymentMethod === "Stripe" && stripeClientSecret && (
+                <StripePayment
+                  priceInCents={Number(totalPrice) * 100}
+                  orderId={order.id}
+                  clientSecret={stripeClientSecret}
                 />
               )}
 
