@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    // Optimize middleware bundle size
+    serverMinification: true,
+  },
 };
 
 export default nextConfig;
