@@ -3,7 +3,6 @@ import { productDefaultValues } from "@/lib/constants";
 import { productSchema, updateProductSchema } from "@/lib/validator";
 import { Product } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -22,13 +21,12 @@ import { Textarea } from "../ui/textarea";
 const ProductForm = ({
   type,
   product,
-  productId,
 }: {
   type: "Create" | "Update";
   product?: Product;
   productId?: string;
 }) => {
-  const router = useRouter();
+  // const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(
