@@ -3,8 +3,9 @@ import { productDefaultValues } from "@/lib/constants";
 import { productSchema, updateProductSchema } from "@/lib/validator";
 import { Product } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -17,16 +18,28 @@ import slugify from "slugify";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
+import {
+  createProduct,
+  updateProduct,
+} from "@/lib/actions/products/product-action";
+import toast from "react-hot-toast";
+import { asStringMessage } from "@/lib/utils";
+import z from "zod";
+import { UploadButton } from "@/lib/uploadthing";
+import { Card, CardContent } from "../ui/card";
+import Image from "next/image";
+import { Checkbox } from "../ui/checkbox";
 
 const ProductForm = ({
   type,
   product,
+  productId,
 }: {
   type: "Create" | "Update";
   product?: Product;
   productId?: string;
 }) => {
-  // const router = useRouter();
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(
@@ -37,13 +50,51 @@ const ProductForm = ({
         ? product
         : {
             ...productDefaultValues,
-            numReviews: Number(productDefaultValues.numReviews),
+            numReviews: product?.numReviews || 0,
           },
   });
 
+  const onSubmit: SubmitHandler<z.infer<typeof productSchema>> = async (
+    values
+  ) => {
+    // On Create
+    if (type === "Create") {
+      const res = await createProduct(values);
+      if (!res.success) {
+        toast.error(asStringMessage((res as { message?: unknown }).message));
+      } else {
+        toast.success(asStringMessage((res as { message?: unknown }).message));
+      }
+      router.push("/admin/products");
+    }
+
+    // On Update
+    if (type === "Update") {
+      if (!productId) {
+        router.push("/admin/products");
+      }
+
+      const res = await updateProduct({ ...values, id: productId! });
+      if (!res.success) {
+        toast.error(asStringMessage((res as { message?: unknown }).message));
+      } else {
+        toast.success(asStringMessage((res as { message?: unknown }).message));
+      }
+      router.push("/admin/products");
+    }
+  };
+
+  const images = form.watch("image");
+  const isFeatured = form.watch("isFeatured");
+  const banner = form.watch("banner");
+
   return (
     <Form {...form}>
-      <form className="space-y-8" method="POST">
+      <form
+        className="space-y-8"
+        method="POST"
+        onSubmit={form.handleSubmit(onSubmit)}
+      >
         <div className="flex flex-col gap-5 md:flex-row">
           {/* Name  */}
           <FormField
@@ -156,9 +207,92 @@ const ProductForm = ({
           />
         </div>
         <div className="flex flex-col gap-5 md:flex-row upload-field">
-          {/* Images */}
+          {/* Image upload */}
+          <FormField
+            control={form.control}
+            name="image"
+            render={() => (
+              <FormItem className="w-full">
+                <FormLabel>Image</FormLabel>
+                <Card>
+                  <CardContent className="space-y-2 mt-2 min-h-48">
+                    <div className="flex-start space-x-2">
+                      {images.map((image: string) => (
+                        <Image
+                          key={image}
+                          src={image}
+                          alt="Product Image"
+                          width={100}
+                          height={100}
+                          className="rounded-sm w-20 h-20 object-cover object-center"
+                        />
+                      ))}
+                      <FormControl>
+                        <UploadButton
+                          endpoint="imageUploader"
+                          onClientUploadComplete={(res: { url: string }[]) => {
+                            form.setValue("image", [...images, res[0].url]);
+                          }}
+                          onUploadError={(error: Error) => {
+                            toast.error(
+                              `Failed to upload image: ${error.message}`
+                            );
+                          }}
+                        />
+                      </FormControl>
+                    </div>
+                  </CardContent>
+                </Card>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-        <div className="upload-field">{/* isFeatured */}</div>
+        <div className="upload-field">
+          {/* isFeatured */}
+          Featured Product
+          <Card>
+            <CardContent className="space-y-2 mt-2">
+              <FormField
+                control={form.control}
+                name="isFeatured"
+                render={({ field }) => (
+                  <FormItem className=" flex space-x-2 items-center">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel>Is Featured</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              {isFeatured && banner && (
+                <Image
+                  src={banner}
+                  alt="Banner Image"
+                  className="w-full object-cover object-center rounded-sm"
+                  width={1920}
+                  height={680}
+                />
+              )}
+
+              {isFeatured && !banner && (
+                <UploadButton
+                  endpoint="imageUploader"
+                  onClientUploadComplete={(res: { url: string }[]) => {
+                    form.setValue("banner", res[0].url);
+                  }}
+                  onUploadError={(error: Error) => {
+                    toast.error(`Failed to upload image: ${error.message}`);
+                  }}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </div>
         <div className="upload-field">
           {/* Description*/}
           <FormField
