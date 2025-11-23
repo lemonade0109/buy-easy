@@ -211,6 +211,13 @@ export const createProduct = async (data: Product) => {
       message: { message: "Product created successfully" },
     };
   } catch (error) {
+    // Check for unique constraint violation on slug
+    if (error instanceof Error && error.message.includes('Unique constraint failed on the fields: (`slug`)')) {
+      return {
+        success: false,
+        message: { message: "A product with this slug already exists. Please use a different slug or modify the product name." },
+      };
+    }
     return {
       success: false,
       message: renderError(error),
@@ -241,6 +248,13 @@ export const updateProduct = async (
       message: { message: "Product updated successfully" },
     };
   } catch (error) {
+    // Check for unique constraint violation on slug
+    if (error instanceof Error && error.message.includes('Unique constraint failed on the fields: (`slug`)')) {
+      return {
+        success: false,
+        message: { message: "A product with this slug already exists. Please use a different slug." },
+      };
+    }
     return {
       success: false,
       message: renderError(error),
