@@ -5,6 +5,7 @@ import {
   convertToPlainObject,
   decimalToNumber,
   renderError,
+  roundToTwoDecimalPlaces,
 } from "@/lib/utils";
 import type { Order as OrderType, PaymentResult } from "@/types";
 import { getCartItems } from "../cart/cart-actions";
@@ -65,18 +66,72 @@ export const createOrder = async () => {
       totalPrice: cart.totalPrice,
     });
 
+    // Validate all products exist and remove invalid items
+    const validItems: CartItem[] = [];
+    const invalidItems: string[] = [];
+
+    for (const item of cart.items as CartItem[]) {
+      const product = await prisma.product.findUnique({
+        where: { id: item.productId },
+      });
+
+      if (product) {
+        validItems.push(item);
+      } else {
+        invalidItems.push(item.name);
+      }
+    }
+
+    // If invalid items found, clean cart and notify user
+    if (invalidItems.length > 0) {
+      // Calculate new prices for valid items
+      const itemsPrice = roundToTwoDecimalPlaces(
+        validItems.reduce(
+          (acc, item) => acc + Number(item.price) * item.quantity,
+          0
+        )
+      );
+      const shippingPrice = roundToTwoDecimalPlaces(itemsPrice > 100 ? 0 : 10);
+      const taxPrice = roundToTwoDecimalPlaces(0.15 * itemsPrice);
+      const totalPrice = roundToTwoDecimalPlaces(
+        itemsPrice + shippingPrice + taxPrice
+      );
+
+      // Update cart with only valid items
+      await prisma.cart.update({
+        where: { id: cart.id },
+        data: {
+          items: validItems,
+          itemsPrice: itemsPrice.toFixed(2),
+          shippingPrice: shippingPrice.toFixed(2),
+          taxPrice: taxPrice.toFixed(2),
+          totalPrice: totalPrice.toFixed(2),
+        },
+      });
+
+      throw new Error(
+        `The following products are no longer available and have been removed: ${invalidItems.join(
+          ", "
+        )}. Please review your cart and try again.`
+      );
+    }
+
     // Create a transaction to create order and order items in DB
     const insertedOrderId = await prisma.$transaction(async (tx) => {
       // Create Order
       const insertOrder = await tx.order.create({ data: order });
 
-      // Create Order Items from the cart items
-      for (const item of cart.items as CartItem[]) {
+      // Create Order Items from validated cart items
+      for (const item of validItems) {
         await tx.orderItem.create({
           data: {
-            ...item,
+            productId: item.productId,
             orderId: insertOrder.id,
+            name: item.name,
+            quantity: item.quantity,
             price: item.price,
+            image: item.image,
+            slug: item.slug,
           },
         });
       }
