@@ -7,7 +7,11 @@ import {
   renderError,
   roundToTwoDecimalPlaces,
 } from "@/lib/utils";
-import type { Order as OrderType, PaymentResult } from "@/types";
+import type {
+  Order as OrderType,
+  PaymentResult,
+  ShippingAddress,
+} from "@/types";
 import { getCartItems } from "../cart/cart-actions";
 import { getUserById } from "../users/user-actions";
 import { insertOrderSchema, validateWithZodSchema } from "@/lib/validator";
@@ -18,6 +22,7 @@ import { paypal } from "@/lib/paypal";
 import { revalidatePath } from "next/cache";
 import { ORDER_ITEMS_PER_PAGE } from "@/lib/constants";
 import { Prisma } from "@prisma/client";
+import { sendPurchaseReceiptEmail } from "@/email";
 
 // Create order and create the order items
 export const createOrder = async () => {
@@ -356,6 +361,22 @@ export const updateOrderToPaid = async (
   });
 
   if (!updatedOrder) throw new Error("Order not found");
+
+  sendPurchaseReceiptEmail({
+    order: {
+      ...updatedOrder,
+      itemsPrice: String(updatedOrder.itemsPrice),
+      shippingPrice: String(updatedOrder.shippingPrice),
+      taxPrice: String(updatedOrder.taxPrice),
+      totalPrice: String(updatedOrder.totalPrice),
+      shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
+      paymentResult: updatedOrder.paymentResult as PaymentResult,
+      orderitems: updatedOrder.orderitems.map((item) => ({
+        ...item,
+        price: String(item.price),
+      })),
+    },
+  });
 };
 
 // Get user orders with pagination
