@@ -9,34 +9,34 @@ import Rating from "./rating";
 
 const ProductCard = ({ product }: { product: Product }) => {
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <Link href={`/product/${product.slug}`}>
-          <Image
-            src={product.image[0]}
-            alt={product.name}
-            width={300}
-            height={300}
-            priority={true}
-          />
-        </Link>
-      </CardHeader>
-      <CardContent className="p-4 grid gap-4">
-        <div className="text-xs">{product.brand}</div>
+    <Card className="w-full max-w-sm group ">
+      <Link href={`/product/${product.slug}`}>
+        <CardHeader>
+          <div className="relative mb-2 overflow-hidden rounded-md h-[300px]">
+            <Image
+              src={product.image[0]}
+              fill
+              sizes="(max-width:768px) 100vw 50vw"
+              alt={product.name}
+              className="rounded-md object-cover transform group-hover:scale-110 transition-transform duration-500"
+            />
+          </div>
+        </CardHeader>
+        <CardContent className="p-4 grid gap-4">
+          <div className="text-xs">{product.brand}</div>
 
-        <Link href={`/product/${product.slug}`}>
           <h2 className="text-sm font-semibold">{product.name}</h2>
-        </Link>
 
-        <div className="flex-between gap-4">
-          <Rating value={Number(product.rating) || 0} />
-          {(product.stockCount ?? 0) > 0 ? (
-            <ProductPrice value={Number(product.price)} />
-          ) : (
-            <span className="text-destructive font-medium">Out of Stock</span>
-          )}
-        </div>
-      </CardContent>
+          <div className="flex-between gap-4">
+            <Rating value={Number(product.rating) || 0} />
+            {(product.stockCount ?? 0) > 0 ? (
+              <ProductPrice value={Number(product.price)} />
+            ) : (
+              <span className="text-destructive font-medium">Out of Stock</span>
+            )}
+          </div>
+        </CardContent>
+      </Link>
     </Card>
   );
 };
