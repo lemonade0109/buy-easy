@@ -13,8 +13,11 @@ const MarkAsPaidButton = ({ orderId }: { orderId: string }) => {
       type="button"
       disabled={isPending}
       onClick={() => {
+        console.log("🔴 Mark as Paid button clicked for order:", orderId);
         startTransition(async () => {
+          console.log("🟡 Starting payment update for order:", orderId);
           const res = await updateOrderToPaidCOD(orderId);
+          console.log("🟢 Payment update response:", res);
           toast(
             res.success
               ? toast.success(

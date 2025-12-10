@@ -317,6 +317,8 @@ export const updateOrderToPaid = async (
     paymentResult?: PaymentResult;
   }
 ) => {
+  console.log("💳 updateOrderToPaid called for order:", orderId);
+
   // Get order from DB
   const order = await prisma.order.findFirst({
     where: { id: orderId },
@@ -325,6 +327,7 @@ export const updateOrderToPaid = async (
   if (!order) throw new Error("Order not found");
 
   if (order.isPaid) {
+    console.log("⚠️ Order is already paid, skipping email");
     throw new Error("Order is already paid");
   }
 
@@ -362,21 +365,29 @@ export const updateOrderToPaid = async (
 
   if (!updatedOrder) throw new Error("Order not found");
 
-  sendPurchaseReceiptEmail({
-    order: {
-      ...updatedOrder,
-      itemsPrice: String(updatedOrder.itemsPrice),
-      shippingPrice: String(updatedOrder.shippingPrice),
-      taxPrice: String(updatedOrder.taxPrice),
-      totalPrice: String(updatedOrder.totalPrice),
-      shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
-      paymentResult: updatedOrder.paymentResult as PaymentResult,
-      orderitems: updatedOrder.orderitems.map((item) => ({
-        ...item,
-        price: String(item.price),
-      })),
-    },
-  });
+  // Send email asynchronously (don't block payment confirmation)
+  console.log("🔔 Payment confirmed! Preparing to send email...");
+  try {
+    await sendPurchaseReceiptEmail({
+      order: {
+        ...updatedOrder,
+        itemsPrice: String(updatedOrder.itemsPrice),
+        shippingPrice: String(updatedOrder.shippingPrice),
+        taxPrice: String(updatedOrder.taxPrice),
+        totalPrice: String(updatedOrder.totalPrice),
+        shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
+        paymentResult: updatedOrder.paymentResult as PaymentResult,
+        orderitems: updatedOrder.orderitems.map((item) => ({
+          ...item,
+          price: String(item.price),
+        })),
+      },
+    });
+    console.log("✅ Email process completed successfully!");
+  } catch (emailError) {
+    // Log email error but don't fail the payment
+    console.error("❌ Failed to send purchase receipt email:", emailError);
+  }
 };
 
 // Get user orders with pagination
@@ -528,6 +539,7 @@ export const deleteOrder = async (id: string) => {
 
 // Update COD order to paid
 export const updateOrderToPaidCOD = async (orderId: string) => {
+  console.log("🟠 updateOrderToPaidCOD called for order:", orderId);
   try {
     await updateOrderToPaid(orderId);
 
@@ -538,6 +550,7 @@ export const updateOrderToPaidCOD = async (orderId: string) => {
       message: "Order marked as paid",
     };
   } catch (error) {
+    console.error("🔴 Error in updateOrderToPaidCOD:", error);
     return {
       success: false,
       message: renderError(error),

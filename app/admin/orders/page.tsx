@@ -1,7 +1,7 @@
 import React from "react";
 import { Metadata } from "next";
 import { deleteOrder, getAllOrders } from "@/lib/actions/orders/order-actions";
-import { auth } from "@/auth";
+import { requireAdmin } from "@/lib/auth-guard";
 import {
   Table,
   TableBody,
@@ -24,12 +24,8 @@ export const metadata: Metadata = {
 export default async function AdminOrderPage(props: {
   searchParams: Promise<{ page?: string; query: string }>;
 }) {
+  await requireAdmin();
   const { page = "1", query: searchText } = await props.searchParams;
-  const session = await auth();
-
-  if (session?.user?.role !== "admin") {
-    throw new Error("Unauthorized");
-  }
 
   const orders = await getAllOrders({
     page: Number(page),

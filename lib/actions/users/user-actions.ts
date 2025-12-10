@@ -18,6 +18,9 @@ import { ShippingAddress } from "@/types";
 import z from "zod";
 import { ORDER_ITEMS_PER_PAGE } from "@/lib/constants";
 import { revalidatePath } from "next/cache";
+import { createEmailVerificationToken } from "@/lib/email-verification/email-verification";
+import { sendVerificationEmail } from "@/lib/email-verification/send-verification-email";
+import { redirect } from "next/navigation";
 
 // Check if email exists
 export const emailExists = async (email: string): Promise<boolean> => {
@@ -43,14 +46,20 @@ export const signInUserWithCredentials = async (
     const lookupEmail = String(validatedData.email).trim();
     const existingUser = await prisma.user.findFirst({
       where: { email: { equals: lookupEmail, mode: "insensitive" } },
-      select: { id: true },
+      select: { id: true, emailVerified: true },
     });
 
     if (!existingUser) {
       return { success: false, message: "User not found" };
     }
 
-    // Use redirect: false so we can handle errors returned by signIn and
+    // Check if email is verified
+    if (!existingUser.emailVerified) {
+      return {
+        success: false,
+        message: "Please verify your email before signing in.",
+      };
+    }
 
     const res = await signIn("credentials", {
       ...validatedData,
@@ -59,12 +68,6 @@ export const signInUserWithCredentials = async (
     });
 
     // `signIn` may return an object with `error` or `url` depending on outcome.
-    try {
-      // eslint-disable-next-line no-console
-      console.debug("[auth] signIn raw result type:", typeof res);
-      // eslint-disable-next-line no-console
-      console.debug("[auth] signIn raw result:", res);
-    } catch (e) {}
     type SignInResult =
       | { error?: string; url?: string; ok?: boolean }
       | undefined
@@ -100,17 +103,15 @@ export const signInUserWithCredentials = async (
 export const signUpUser = async (prevState: unknown, formData: FormData) => {
   try {
     const rawData = Object.fromEntries(formData);
-    const callbackUrl = (rawData.callbackUrl as string) || "/";
     const validatedData = validateWithZodSchema(userSignUpSchema, rawData);
 
     if (await emailExists(validatedData.email)) {
       return { success: false, message: "Email already in use" };
     }
 
-    const plainPassword = validatedData.password;
     validatedData.password = hashSync(validatedData.password, 10);
 
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         name: validatedData.name,
         email: validatedData.email,
@@ -118,14 +119,11 @@ export const signUpUser = async (prevState: unknown, formData: FormData) => {
       },
     });
 
-    await signIn("credentials", {
-      email: validatedData.email,
-      password: plainPassword,
-      redirect: true,
-      callbackUrl,
-    });
+    const token = await createEmailVerificationToken(newUser.id);
+    const firstName = newUser.name.split(" ")[0];
+    await sendVerificationEmail(newUser.email, token, firstName);
 
-    return { success: true, message: "User created successfully" };
+    redirect(`/verify-email/sent?email=${validatedData.email}`);
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;

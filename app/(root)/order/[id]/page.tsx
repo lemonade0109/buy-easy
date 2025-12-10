@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import OrderDetailsTable from "./order-details-table";
 import { ShippingAddress } from "@/types";
 import { auth } from "@/auth";
+import { isAdmin } from "@/lib/admin";
 import Stripe from "stripe";
 
 export const metadata: Metadata = {
@@ -48,7 +49,7 @@ export default async function OrderDetailsPage(props: {
         }}
         stripeClientSecret={client_secret}
         paypalClientId={process.env.PAYPAL_CLIENT_ID || "sb"}
-        isAdmin={session?.user?.role === "admin" || false}
+        isAdmin={isAdmin(session?.user?.email)}
       />
     </>
   );

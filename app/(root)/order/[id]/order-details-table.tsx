@@ -111,35 +111,28 @@ const OrderDetailsTable = ({
                 </TableHeader>
 
                 <TableBody>
-                  {orderitems.map(
-                    (item) => (
-                      console.log("orderItem:", item),
-                      (
-                        <TableRow key={item.slug}>
-                          <>
-                            <TableCell>
-                              <NextLink
-                                href={`/product/${item.slug}`}
-                                className="flex items-center"
-                              >
-                                <Image
-                                  src={String(item.image)}
-                                  alt={item.name}
-                                  width={50}
-                                  height={50}
-                                />
-                                <span className="px-2">{item.name}</span>
-                              </NextLink>
-                            </TableCell>
-                            <TableCell>
-                              <span className="px-2">{item.quantity}</span>
-                            </TableCell>
-                            <TableCell className="">${item.price}</TableCell>
-                          </>
-                        </TableRow>
-                      )
-                    )
-                  )}
+                  {orderitems.map((item) => (
+                    <TableRow key={item.slug}>
+                      <TableCell>
+                        <NextLink
+                          href={`/product/${item.slug}`}
+                          className="flex items-center"
+                        >
+                          <Image
+                            src={String(item.image)}
+                            alt={item.name}
+                            width={50}
+                            height={50}
+                          />
+                          <span className="px-2">{item.name}</span>
+                        </NextLink>
+                      </TableCell>
+                      <TableCell>
+                        <span className="px-2">{item.quantity}</span>
+                      </TableCell>
+                      <TableCell className="">${item.price}</TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </CardContent>

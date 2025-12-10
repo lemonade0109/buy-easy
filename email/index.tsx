@@ -1,30 +1,53 @@
-import { Resend } from "resend";
-import { SENDER_EMAIL, APP_NAME } from "@/lib/constants";
+import nodemailer from "nodemailer";
+import { render } from "@react-email/components";
+import { APP_NAME } from "@/lib/constants";
 import type { Order } from "@/types";
 import "dotenv/config";
 import React from "react";
 import PurchaseReceiptEmail from "./purchase-receipt";
 
-const resend = new Resend(process.env.RESEND_API_KEY || "");
+// Create Nodemailer transporter with Brevo SMTP
+const transporter = nodemailer.createTransport({
+  //TODO: Use environment variables
+  host: process.env.SMTP_HOST || "smtp-relay.brevo.com",
+  port: parseInt(process.env.SMTP_PORT || "587"),
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
 export const sendPurchaseReceiptEmail = async ({ order }: { order: Order }) => {
   try {
-    const { data, error } = await resend.emails.send({
-      from: `${APP_NAME} <${SENDER_EMAIL}>`,
+    console.log(
+      `📧 Attempting to send email for Order #${order.id} to ${order.user.email}...`
+    );
+
+    // Render the React Email component to HTML
+    const emailHtml = await render(<PurchaseReceiptEmail order={order} />);
+
+    const senderEmail =
+      process.env.SENDER_EMAIL || "noreply@jubriloyebamiji.com";
+    const senderName = process.env.SENDER_NAME || APP_NAME;
+
+    console.log(`📤 Sending from: ${senderName} <${senderEmail}>`);
+
+    // Send email using Nodemailer
+    const info = await transporter.sendMail({
+      from: `${senderName} <${senderEmail}>`,
       to: order.user.email,
       subject: `Purchase Receipt - Order #${order.id}`,
-      react: <PurchaseReceiptEmail order={order} />,
+      html: emailHtml,
     });
 
-    if (error) {
-      console.error("Failed to send email:", error);
-      throw new Error(`Email sending failed: ${error.message}`);
-    }
+    console.log("✅ Email sent successfully!");
+    console.log(`📬 Message ID: ${info.messageId}`);
+    console.log(`📨 Sent to: ${order.user.email}`);
 
-    console.log("Email sent successfully:", data);
-    return data;
+    return { id: info.messageId, success: true };
   } catch (error) {
-    console.error("Error sending purchase receipt email:", error);
+    console.error("❌ Error sending purchase receipt email:", error);
     throw error;
   }
 };

@@ -37,20 +37,7 @@ export const {
         const user = await prisma.user.findFirst({
           where: { email: { equals: lookupEmail, mode: "insensitive" } },
         });
-        // Debug logs for credentials sign-in flow. These are safe (don't log raw passwords).
-        try {
-          console.debug(
-            "[auth] credentials.authorize - email:",
-            credentials.email
-          );
-          console.debug(
-            "[auth] credentials.authorize - user found:",
-            !!user,
-            user?.id
-          );
-        } catch (e) {
-          // ignore logging errors in production
-        }
+
         if (!user || !user.password) return null;
 
         // Ensure values are strings for compareSync
@@ -59,13 +46,12 @@ export const {
 
         // Check if Password matches
         const isMatch = compareSync(plainPassword, hashedPassword);
-        try {
-          console.debug(
-            "[auth] credentials.authorize - password match:",
-            isMatch
-          );
-        } catch (e) {}
         if (!isMatch) return null;
+
+        // Check if email is verified
+        if (!user.emailVerified) {
+          throw new Error("Email Not Verified");
+        }
 
         return {
           id: user.id,

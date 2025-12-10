@@ -32,7 +32,7 @@ const calcPrices = (items: CartItem[]) => {
   };
 };
 
-export const addToCart = async (data: CartItem) => {
+export async function addToCart(data: CartItem) {
   try {
     //Check for cart cookie
     const sessionCartId = (await cookies()).get("session_cartId")?.value;
@@ -62,7 +62,7 @@ export const addToCart = async (data: CartItem) => {
       //No existing cart, create new cart
       const newCartItems = insertCartSchema.parse({
         sessionCartId: sessionCartId,
-        userId: userId,
+        userId: userId || null,
         items: [validatedItem],
         ...calcPrices([validatedItem]),
       });
@@ -116,17 +116,31 @@ export const addToCart = async (data: CartItem) => {
       return {
         success: true,
         message: `${product.name} ${
-          existingItem ? "updated in" : "added to"
+          existingItem ? "has been updated in" : "has been added to"
         } cart`,
       };
     }
   } catch (error) {
+    // Log the actual error for debugging
+    console.error("[Cart Error - addToCart]:", error);
+
+    // Return user-friendly messages for known errors
+    if (error instanceof Error) {
+      if (error.message === "Product not found") {
+        return { success: false, message: "Product not found" };
+      }
+      if (error.message === "Not enough stock") {
+        return { success: false, message: "Not enough stock available" };
+      }
+    }
+
+    // Generic message for unexpected errors
     return {
       success: false,
-      message: renderError(error),
+      message: "Something went wrong. Please try again.",
     };
   }
-};
+}
 
 export const getCartItems = async () => {
   //Check for cart cookie
@@ -207,9 +221,23 @@ export const removeFromCart = async (productId: string) => {
       message: `${product.name} was removed from cart`,
     };
   } catch (error) {
+    // Log the actual error for debugging
+    console.error("[Cart Error - removeFromCart]:", error);
+
+    // Return user-friendly messages for known errors
+    if (error instanceof Error) {
+      if (error.message === "Product not found") {
+        return { success: false, message: "Product not found" };
+      }
+      if (error.message === "Item not found in cart") {
+        return { success: false, message: "Item not found in cart" };
+      }
+    }
+
+    // Generic message for unexpected errors
     return {
       success: false,
-      message: renderError(error),
+      message: "Something went wrong. Please try again.",
     };
   }
 };

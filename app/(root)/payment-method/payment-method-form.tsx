@@ -113,7 +113,6 @@ const PaymentMethodForm = ({
           </form>
         </Form>
       </div>
-      ;
     </>
   );
 };

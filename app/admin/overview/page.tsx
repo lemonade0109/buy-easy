@@ -23,11 +23,6 @@ export const metadata: Metadata = {
 
 export default async function AdminOverviewPage() {
   await requireAdmin();
-  const session = await auth();
-
-  if (session?.user?.role !== "admin") {
-    throw new Error("User is not authorized ");
-  }
 
   const summary = await getOrderSummary();
 

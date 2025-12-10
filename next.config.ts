@@ -9,10 +9,17 @@ const nextConfig: NextConfig = {
         port: "",
       },
     ],
+    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Increase timeout for slow image responses
+    unoptimized: false,
   },
+  // Increase server timeout for image optimization
   experimental: {
-    // Optimize middleware bundle size
     serverMinification: true,
+    proxyTimeout: 120000, // 2 minutes
   },
 };
 

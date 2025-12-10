@@ -192,7 +192,6 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
           </form>
         </Form>
       </div>
-      ;
     </>
   );
 };

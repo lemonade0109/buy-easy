@@ -18,7 +18,7 @@ export default function CartToast({
     <div className="flex items-start gap-4 max-w-sm w-full bg-white dark:bg-slate-900 shadow-md rounded-md p-3 border border-slate-100 dark:border-slate-800">
       <div className="flex items-start ">
         <div className="flex-1">
-          <span className="text-xs text-slate-600 dark:text-slate-300">
+          <span className="text-xs text-slate-600 dark:text-slate-300 ">
             {description}
           </span>
         </div>
