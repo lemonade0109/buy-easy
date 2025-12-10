@@ -21,6 +21,7 @@ import { ArrowRight, Loader } from "lucide-react";
 import { updateUserAddress } from "@/lib/actions/users/user-actions";
 import toast from "react-hot-toast";
 import { asStringMessage } from "@/lib/utils";
+import CountriesInput from "@/components/form/countriesInput";
 
 const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
   const router = useRouter();
@@ -170,9 +171,11 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
                   <FormItem className="w-full">
                     <FormLabel>Country</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your country" {...field} />
+                      <CountriesInput
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
-
                     <FormMessage />
                   </FormItem>
                 )}

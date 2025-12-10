@@ -317,8 +317,6 @@ export const updateOrderToPaid = async (
     paymentResult?: PaymentResult;
   }
 ) => {
-  console.log("💳 updateOrderToPaid called for order:", orderId);
-
   // Get order from DB
   const order = await prisma.order.findFirst({
     where: { id: orderId },
@@ -327,7 +325,6 @@ export const updateOrderToPaid = async (
   if (!order) throw new Error("Order not found");
 
   if (order.isPaid) {
-    console.log("⚠️ Order is already paid, skipping email");
     throw new Error("Order is already paid");
   }
 
@@ -366,7 +363,6 @@ export const updateOrderToPaid = async (
   if (!updatedOrder) throw new Error("Order not found");
 
   // Send email asynchronously (don't block payment confirmation)
-  console.log("🔔 Payment confirmed! Preparing to send email...");
   try {
     await sendPurchaseReceiptEmail({
       order: {
@@ -383,10 +379,9 @@ export const updateOrderToPaid = async (
         })),
       },
     });
-    console.log("✅ Email process completed successfully!");
   } catch (emailError) {
     // Log email error but don't fail the payment
-    console.error("❌ Failed to send purchase receipt email:", emailError);
+    console.error("Failed to send purchase receipt email:", emailError);
   }
 };
 

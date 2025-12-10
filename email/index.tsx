@@ -20,18 +20,12 @@ const transporter = nodemailer.createTransport({
 
 export const sendPurchaseReceiptEmail = async ({ order }: { order: Order }) => {
   try {
-    console.log(
-      `📧 Attempting to send email for Order #${order.id} to ${order.user.email}...`
-    );
-
     // Render the React Email component to HTML
     const emailHtml = await render(<PurchaseReceiptEmail order={order} />);
 
     const senderEmail =
       process.env.SENDER_EMAIL || "noreply@jubriloyebamiji.com";
     const senderName = process.env.SENDER_NAME || APP_NAME;
-
-    console.log(`📤 Sending from: ${senderName} <${senderEmail}>`);
 
     // Send email using Nodemailer
     const info = await transporter.sendMail({
@@ -41,13 +35,9 @@ export const sendPurchaseReceiptEmail = async ({ order }: { order: Order }) => {
       html: emailHtml,
     });
 
-    console.log("✅ Email sent successfully!");
-    console.log(`📬 Message ID: ${info.messageId}`);
-    console.log(`📨 Sent to: ${order.user.email}`);
-
     return { id: info.messageId, success: true };
   } catch (error) {
-    console.error("❌ Error sending purchase receipt email:", error);
+    console.error("Error sending purchase receipt email:", error);
     throw error;
   }
 };

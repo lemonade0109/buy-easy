@@ -12,8 +12,6 @@ export const sendVerificationEmail = async (
   const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
   const verificationUrl = `${baseUrl}/verify-email?token=${token}`;
 
-  console.log(`📧 Preparing to send verification email to ${email}`);
-
   try {
     // Create SMTP transporter
     const transporter = nodemailer.createTransport({
@@ -38,8 +36,6 @@ export const sendVerificationEmail = async (
     );
 
     // Send the email
-    console.log(`📤 Sending verification email to ${email}...`);
-
     const info = await transporter.sendMail({
       from: `${senderName} <${senderEmail}>`,
       to: email,
@@ -47,12 +43,9 @@ export const sendVerificationEmail = async (
       html: emailHtml,
     });
 
-    console.log(`✅ Verification email sent successfully to ${email}`);
-    console.log(`📨 Message ID: ${info.messageId}`);
-
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error(`❌ Failed to send verification email to ${email}:`, error);
+    console.error(`Failed to send verification email to ${email}:`, error);
     throw error;
   }
 };

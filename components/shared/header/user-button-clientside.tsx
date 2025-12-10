@@ -9,17 +9,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { isAdmin } from "@/lib/admin";
 import { signOutUser } from "@/lib/actions/users/user-actions";
 
 const UserButtonClientSide = ({
   firstInitial,
   email,
   name,
+  isAdmin,
 }: {
   firstInitial: string;
   email: string;
   name: string;
+  isAdmin: boolean;
 }) => {
   const [open, setOpen] = React.useState(false);
   return (
@@ -60,7 +61,7 @@ const UserButtonClientSide = ({
           </Link>
         </DropdownMenuItem>
 
-        {isAdmin(email) && (
+        {isAdmin && (
           <DropdownMenuItem>
             <Link href="/admin/overview" className="w-full ml-2">
               Admin
