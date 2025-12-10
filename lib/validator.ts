@@ -42,7 +42,7 @@ export const userSignInSchema = z.object({
   email: z
     .string()
     .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
 // Schema for signing up users
@@ -52,14 +52,21 @@ export const userSignUpSchema = z
     email: z
       .string()
       .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters long"),
-    confirmPassword: z
+    password: z
       .string()
-      .min(6, "Confirm password must be at least 6 characters"),
+      .min(8, "Password must be at least 8 characters long")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(
+        /[^a-zA-Z0-9]/,
+        "Password must contain at least one special character"
+      ),
+    confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Password don't match",
     path: ["confirmPassword"],
+    message: "Password don't match",
   });
 
 export function validateWithZodSchema<S extends z.ZodTypeAny>(

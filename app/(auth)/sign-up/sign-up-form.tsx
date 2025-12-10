@@ -12,11 +12,51 @@ import { useSearchParams } from "next/navigation";
 import React from "react";
 import { useFormStatus } from "react-dom";
 
+function getPasswordScore(password: string) {
+  let score = 0;
+  if (password.length >= 8) score += 1;
+  if (/[A-Z]/.test(password)) score += 1;
+  if (/[a-z]/.test(password)) score += 1;
+  if (/[0-9]/.test(password)) score += 1;
+  if (/[^A-Za-z0-9]/.test(password)) score += 1;
+  return score;
+}
+
+function getPasswordStrengthLabel(score: number) {
+  switch (score) {
+    case 0:
+    case 1:
+      return "Very Weak";
+    case 2:
+      return "Weak";
+    case 3:
+      return "Moderate";
+    case 4:
+      return "Strong";
+    case 5:
+      return "Very Strong";
+    default:
+      return "";
+  }
+}
+
 const SignUpForm = () => {
   const [data, action] = React.useActionState(signUpUser, {
     success: false,
     message: "",
   });
+
+  const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+
+  const [showPasswordStrength, setShowPasswordStrength] = React.useState(false);
+  const passwordScore = getPasswordScore(password);
+  const passwordStrengthLabel = getPasswordStrengthLabel(passwordScore);
+
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const passwordMatch =
+    confirmPassword.length > 0 && password === confirmPassword;
+  const isTooWeak = password.length > 0 && passwordScore < 3;
 
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
@@ -64,9 +104,58 @@ const SignUpForm = () => {
           type="password"
           name="password"
           autoComplete="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          onFocus={() => setShowPasswordStrength(true)}
+          onBlur={() => setShowPasswordStrength(false)}
           required
-          defaultValue={signUpDefaultValues.password}
         />
+        {showPasswordStrength && (
+          <div className="mt-2">
+            <div className="flex gap-1">
+              {[...Array(5)].map((_, index) => {
+                let bgColor = "bg-gray-300";
+                if (index < passwordScore) {
+                  if (passwordScore <= 2) {
+                    bgColor = "bg-red-500";
+                  } else if (passwordScore === 3) {
+                    bgColor = "bg-yellow-500";
+                  } else {
+                    bgColor = "bg-green-500";
+                  }
+                }
+                return (
+                  <div
+                    key={index}
+                    className={`h-1 flex-1 rounded ${bgColor}`}
+                  ></div>
+                );
+              })}
+            </div>
+            {password && (
+              <div
+                className={`text-xs mt-1 ${
+                  passwordScore <= 2
+                    ? "text-red-600"
+                    : passwordScore === 3
+                      ? "text-yellow-600"
+                      : "text-green-600"
+                }`}
+              >
+                {password
+                  ? `Strength: ${passwordStrengthLabel}`
+                  : "Enter a password"}
+              </div>
+            )}
+
+            {isTooWeak && (
+              <p className="text-sm text-red-500 mt-1">
+                Please use at least 8 characters with lowercase, uppercase,
+                number and a special character.
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -76,9 +165,24 @@ const SignUpForm = () => {
           type="password"
           name="confirmPassword"
           autoComplete="confirmPassword"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          onFocus={() => setShowConfirmPassword(true)}
+          onBlur={() => setShowConfirmPassword(false)}
           required
-          defaultValue={signUpDefaultValues.confirmPassword}
         />
+
+        {showConfirmPassword && confirmPassword.length > 0 && (
+          <p
+            className={`mt-1 text-xs ${
+              passwordMatch ? "text-green-500" : "text-red-500"
+            }`}
+          >
+            {passwordMatch
+              ? "Passwords match ✅ "
+              : "Passwords do not match ❌"}
+          </p>
+        )}
       </div>
       <div>
         <SignUpButton />
