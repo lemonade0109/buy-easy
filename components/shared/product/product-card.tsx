@@ -1,28 +1,30 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ProductPrice from "./product-price";
 import { Product } from "@/types";
 import Rating from "./rating";
+import WishlistButton from "./wishlist-button";
+import { isProductInWishlist } from "@/lib/actions/wishlists/wishlist";
 
-const ProductCard = ({ product }: { product: Product }) => {
+const ProductCard = async ({ product }: { product: Product }) => {
+  const isInWishlist = await isProductInWishlist({
+    productId: product.id || "",
+  });
   return (
-    <Card className="w-full max-w-sm group ">
+    <article className="group relative shadow-md hover:shadow-lg transition-shadow duration-300 rounded-md overflow-hidden w-full max-w-sm">
       <Link href={`/product/${product.slug}`}>
-        <CardHeader>
-          <div className="relative mb-2 overflow-hidden rounded-md h-[300px]">
-            <Image
-              src={product.image[0]}
-              fill
-              sizes="(max-width:768px) 100vw 50vw"
-              alt={product.name}
-              className="rounded-md object-cover transform group-hover:scale-110 transition-transform duration-500"
-            />
-          </div>
-        </CardHeader>
-        <CardContent className="p-4 grid gap-4">
+        <div className="relative mb-2 overflow-hidden rounded-t-md h-[300px]">
+          <Image
+            src={product.image[0]}
+            fill
+            sizes="(max-width:768px) 100vw 50vw"
+            alt={product.name}
+            className="object-cover transform group-hover:scale-110 transition-transform duration-500"
+          />
+        </div>
+
+        <div className="p-4 flex flex-col gap-4">
           <div className="text-xs">{product.brand}</div>
 
           <h2 className="text-sm font-semibold">{product.name}</h2>
@@ -35,9 +37,16 @@ const ProductCard = ({ product }: { product: Product }) => {
               <span className="text-destructive font-medium">Out of Stock</span>
             )}
           </div>
-        </CardContent>
+        </div>
       </Link>
-    </Card>
+
+      <div className="absolute top-5 right-5 z-5">
+        <WishlistButton
+          productId={product.id || ""}
+          initialInWishlist={isInWishlist}
+        />
+      </div>
+    </article>
   );
 };
 

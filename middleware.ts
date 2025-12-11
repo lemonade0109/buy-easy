@@ -9,6 +9,7 @@ const protectedRoutes = [
   /\/user\/(.*)/,
   /\/order\/(.*)/,
   /\/admin/,
+  /\/wishlist/,
 ];
 
 export function middleware(req: NextRequest) {

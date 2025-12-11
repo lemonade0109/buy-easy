@@ -6,10 +6,13 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { signOutUser } from "@/lib/actions/users/user-actions";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const UserButtonClientSide = ({
   firstInitial,
@@ -23,6 +26,16 @@ const UserButtonClientSide = ({
   isAdmin: boolean;
 }) => {
   const [open, setOpen] = React.useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await signOutUser();
+      toast.success("You have been signed out.");
+      window.location.href = "/";
+    } catch (error) {
+      toast.error("Failed to sign out. Please try again.");
+    }
+  };
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
@@ -51,7 +64,7 @@ const UserButtonClientSide = ({
 
         <DropdownMenuItem>
           <Link href="/user/profile" className="w-full ml-2">
-            User Profile
+            Profile
           </Link>
         </DropdownMenuItem>
 
@@ -69,16 +82,22 @@ const UserButtonClientSide = ({
           </DropdownMenuItem>
         )}
 
+        <DropdownMenuItem>
+          <Link href="/wishlist" className="w-full ml-2">
+            Wishlist
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
         <DropdownMenuItem className="p-0 mb-1">
-          <form action={signOutUser} className="w-full">
-            <Button
-              type="submit"
-              variant="ghost"
-              className="w-full py-4 h-4 justify-start"
-            >
-              Sign Out
-            </Button>
-          </form>
+          <Button
+            variant="ghost"
+            className="w-full py-4 h-4 justify-start text-red-500 hover:text-red-400"
+            onClick={handleLogout}
+          >
+            Sign Out
+          </Button>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

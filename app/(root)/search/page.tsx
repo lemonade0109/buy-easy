@@ -7,6 +7,7 @@ import {
 import Link from "next/link";
 import React from "react";
 import SortSelect from "@/components/shared/sort-select";
+import { isProductInWishlist } from "@/lib/actions/wishlists/wishlist";
 
 const prices = [
   {

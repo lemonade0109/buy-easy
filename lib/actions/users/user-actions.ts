@@ -145,7 +145,7 @@ export const signUpUser = async (prevState: unknown, formData: FormData) => {
 
 // Action to sign out user
 export const signOutUser = async () => {
-  await signOut({ redirect: true, redirectTo: "/" });
+  await signOut({ redirect: false });
 };
 
 // Get user by ID

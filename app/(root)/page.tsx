@@ -11,6 +11,7 @@ import ProductCarousel from "@/components/shared/product/product-carousel";
 import ViewAllProductsButton from "@/components/view-all-products-button";
 import IconBoxes from "@/components/icon-boxes";
 import DealCountdown from "@/components/deal-countdown";
+import { isProductInWishlist } from "@/lib/actions/wishlists/wishlist";
 
 export const metadata = {
   title: "Home",
@@ -20,6 +21,8 @@ export const metadata = {
 export default async function Homepage() {
   const latestProducts = await getLatestProducts();
   const featuredProducts = await getFeaturedProducts();
+
+  const productId = latestProducts.map((product) => product.id);
 
   // Format price and rating as strings
   const formattedFeaturedProducts = featuredProducts.map((product) => ({
