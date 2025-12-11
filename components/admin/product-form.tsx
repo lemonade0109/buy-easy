@@ -104,7 +104,11 @@ const ProductForm = ({
               <FormItem className="w-full">
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter product name" {...field} />
+                  <Input
+                    placeholder="Enter product name"
+                    {...field}
+                    onBlur={(e) => field.onChange(e.target.value.trim())}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -151,7 +155,11 @@ const ProductForm = ({
               <FormItem className="w-full">
                 <FormLabel>Category</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter category" {...field} />
+                  <Input
+                    placeholder="Enter category"
+                    {...field}
+                    onBlur={(e) => field.onChange(e.target.value.trim())}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -166,7 +174,11 @@ const ProductForm = ({
               <FormItem className="w-full">
                 <FormLabel>Brand</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter brand" {...field} />
+                  <Input
+                    placeholder="Enter brand"
+                    {...field}
+                    onBlur={(e) => field.onChange(e.target.value.trim())}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
