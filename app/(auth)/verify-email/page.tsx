@@ -1,17 +1,7 @@
 export const runtime = "nodejs";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import VerificationPage from "@/components/shared/verification-page";
 import { prisma } from "@/db/prisma";
-import { APP_NAME } from "@/lib/constants";
 import { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import React from "react";
 
 export const metadata: Metadata = {
@@ -66,32 +56,11 @@ export default async function VerifyEmailPage({
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <Card>
-        <CardHeader className="space-y-4">
-          <Link href={"/"} className="flex-center">
-            <Image
-              src="/logo.svg"
-              alt={`${APP_NAME} logo`}
-              width={60}
-              height={60}
-              priority={true}
-            />
-          </Link>
-          <CardTitle className="text-center">{title}</CardTitle>
-          <CardDescription className="text-center">{message}</CardDescription>
-        </CardHeader>
-
-        <CardContent>
-          {showSignInButton && (
-            <div className="mt-4 flex justify-center">
-              <Button asChild>
-                <Link href={`/sign-in`}>Sign in</Link>
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+    <VerificationPage
+      title={title}
+      message={message}
+      showSignInButton={showSignInButton}
+      text="Sign in"
+    />
   );
 }

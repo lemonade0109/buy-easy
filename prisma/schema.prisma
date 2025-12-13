@@ -46,6 +46,7 @@ model User {
   Review                  Review[]
   emailVerificationTokens EmailVerificationToken[]
   wishlists               Wishlist[]
+  passwordResetTokens     PasswordResetToken[]
 
   @@map("users")
 }
@@ -180,4 +181,15 @@ model Wishlist {
 
   @@unique([userId, productId])
   @@map("wishlists")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  token     String   @unique
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  expiresAt DateTime @db.Timestamp(6)
+
+  @@map("password_reset_tokens")
 }

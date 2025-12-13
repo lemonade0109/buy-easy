@@ -64,11 +64,21 @@ const CredentialsSignInForm = () => {
         </div>
       )}
 
-      <div className="text-sm text-center text-muted-foreground">
-        Don&apos;t have an account?{" "}
-        <Link href="/sign-up" className="text-blue-500 hover:underline">
-          Sign Up
-        </Link>
+      <div className="text-sm text-center text-muted-foreground flex flex-col gap-2 justify-center">
+        <span>
+          <Link
+            href="/forgot-password"
+            className="hover:underline hover:text-black text-sm"
+          >
+            Forgot your password?
+          </Link>
+        </span>
+        <span>
+          Don&apos;t have an account?{" "}
+          <Link href="/sign-up" className="text-blue-500 hover:underline">
+            Sign Up
+          </Link>
+        </span>
       </div>
     </form>
   );
