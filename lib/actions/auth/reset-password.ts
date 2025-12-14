@@ -1,10 +1,12 @@
+"use server";
+
 import { prisma } from "@/db/prisma";
 import { renderError } from "@/lib/utils";
 import { resetPasswordSchema, validateWithZodSchema } from "@/lib/validator";
 import { hashSync } from "bcrypt-ts-edge";
 import z from "zod";
 
-const resetPassword = async (prevState: unknown, formData: FormData) => {
+export const resetPassword = async (prevState: unknown, formData: FormData) => {
   try {
     const raw = Object.fromEntries(formData);
     const validatedData = validateWithZodSchema(resetPasswordSchema, raw);
@@ -56,5 +58,3 @@ const resetPassword = async (prevState: unknown, formData: FormData) => {
     };
   }
 };
-
-export default resetPassword;
