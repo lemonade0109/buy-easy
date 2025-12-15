@@ -68,7 +68,7 @@ const CredentialsSignInForm = () => {
         <span>
           <Link
             href="/forgot-password"
-            className="hover:underline hover:text-black text-sm"
+            className="hover:underline hover:text-blue-500 text-blue-500 text-sm"
           >
             Forgot your password?
           </Link>
