@@ -6,6 +6,7 @@ import { Product } from "@/types";
 import Rating from "./rating";
 import WishlistButton from "./wishlist-button";
 import { isProductInWishlist } from "@/lib/actions/wishlists/wishlist";
+import StockBadge from "./stock-badge";
 
 const ProductCard = async ({ product }: { product: Product }) => {
   const isInWishlist = await isProductInWishlist({
@@ -37,6 +38,8 @@ const ProductCard = async ({ product }: { product: Product }) => {
               <span className="text-destructive font-medium">Out of Stock</span>
             )}
           </div>
+
+          <StockBadge stockCount={product.stockCount ?? 0} />
         </div>
       </Link>
 

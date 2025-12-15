@@ -17,6 +17,7 @@ import { requireAdmin } from "@/lib/auth-guard";
 import { formatCurrency, formatId } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
+import { Badge } from "@/components/ui/badge";
 
 export default async function AdminProductsPage(props: {
   searchParams: Promise<{ page: string; query: string; category: string }>;
@@ -77,7 +78,21 @@ export default async function AdminProductsPage(props: {
                 {formatCurrency(product.price as unknown as string | number)}
               </TableCell>
               <TableCell>{product.category}</TableCell>
-              <TableCell>{product.stockCount}</TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  <span>{product.stockCount}</span>
+                  {product.stockCount === 0 && (
+                    <Badge variant="destructive" className="text-xs">
+                      Out
+                    </Badge>
+                  )}
+                  {product.stockCount > 0 && product.stockCount <= 10 && (
+                    <Badge variant="default" className="text-xs bg-orange-500">
+                      Low
+                    </Badge>
+                  )}
+                </div>
+              </TableCell>
               <TableCell>
                 {product.rating as unknown as number | string}
               </TableCell>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import PasswordInput from "@/components/shared/password-input";
 import { signInDefaultValues } from "@/lib/constants";
 import { asStringMessage } from "@/lib/utils";
 import { useFormStatus } from "react-dom";
@@ -45,9 +46,8 @@ const CredentialsSignInForm = () => {
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
           name="password"
           autoComplete="password"
           required

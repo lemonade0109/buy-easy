@@ -60,7 +60,7 @@ export const createOrder = async () => {
       };
     }
 
-    // Here you would typically create the order in your database
+    //  create order in database
     const order = validateWithZodSchema(insertOrderSchema, {
       userId: userId,
       itemsPrice: cart.itemsPrice,
@@ -71,19 +71,33 @@ export const createOrder = async () => {
       totalPrice: cart.totalPrice,
     });
 
-    // Validate all products exist and remove invalid items
+    // Validate all products exist and have sufficient stock
     const validItems: CartItem[] = [];
     const invalidItems: string[] = [];
+    const outOfStockItems: Array<{
+      name: string;
+      available: number;
+      requested: number;
+    }> = [];
 
     for (const item of cart.items as CartItem[]) {
       const product = await prisma.product.findUnique({
         where: { id: item.productId },
       });
 
-      if (product) {
-        validItems.push(item);
-      } else {
+      if (!product) {
+        // Product no longer exists
         invalidItems.push(item.name);
+      } else if (product.stockCount < item.quantity) {
+        // Check if product has insufficient stock
+        outOfStockItems.push({
+          name: item.name,
+          available: product.stockCount,
+          requested: item.quantity,
+        });
+      } else {
+        // Valid item
+        validItems.push(item);
       }
     }
 
@@ -121,8 +135,43 @@ export const createOrder = async () => {
       );
     }
 
-    // Create a transaction to create order and order items in DB
+    // If items are out of stock, notify user
+    if (outOfStockItems.length > 0) {
+      const stockMessages = outOfStockItems.map(
+        (item) =>
+          `${item.name}: only ${item.available} available (requested ${item.requested})`
+      );
+
+      return {
+        success: false,
+        message: `Insufficient stock for the following items:\n${stockMessages.join("\n")}. Please adjust your cart.`,
+      };
+    }
+
+    // Create a transaction to create order, order items, and reserve stock
     const insertedOrderId = await prisma.$transaction(async (tx) => {
+      // Double-check and reserve stock within transaction to prevent race conditions
+      for (const item of validItems) {
+        const product = await tx.product.findUnique({
+          where: { id: item.productId },
+        });
+
+        if (!product || product.stockCount < item.quantity) {
+          return {
+            success: false,
+            message: `Insufficient stock for ${item.name}. Please try again.`,
+          };
+        }
+
+        // Reserve stock by decrementing
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stockCount: { decrement: item.quantity },
+          },
+        });
+      }
+
       // Create Order
       const insertOrder = await tx.order.create({ data: order });
 
@@ -309,82 +358,6 @@ export const approvePayPalOrder = async (
   }
 };
 
-// update order to paid
-export const updateOrderToPaid = async (
-  orderId: string,
-  paymentResult?: {
-    orderId: string;
-    paymentResult?: PaymentResult;
-  }
-) => {
-  // Get order from DB
-  const order = await prisma.order.findFirst({
-    where: { id: orderId },
-    include: { orderitems: true },
-  });
-  if (!order) throw new Error("Order not found");
-
-  if (order.isPaid) {
-    throw new Error("Order is already paid");
-  }
-
-  // Transaction to update order & account for product stock
-  await prisma.$transaction(async (tx) => {
-    // Iterate over products and update stock
-    for (const item of order.orderitems) {
-      await tx.product.update({
-        where: { id: item.productId },
-        data: {
-          stockCount: { increment: -item.quantity },
-        },
-      });
-    }
-
-    // Update order to paid
-    await tx.order.update({
-      where: { id: orderId },
-      data: {
-        isPaid: true,
-        paidAt: new Date(),
-        paymentResult,
-      },
-    });
-  });
-
-  // Get updated order after transaction
-  const updatedOrder = await prisma.order.findFirst({
-    where: { id: orderId },
-    include: {
-      orderitems: true,
-      user: { select: { name: true, email: true } },
-    },
-  });
-
-  if (!updatedOrder) throw new Error("Order not found");
-
-  // Send email asynchronously (don't block payment confirmation)
-  try {
-    await sendPurchaseReceiptEmail({
-      order: {
-        ...updatedOrder,
-        itemsPrice: String(updatedOrder.itemsPrice),
-        shippingPrice: String(updatedOrder.shippingPrice),
-        taxPrice: String(updatedOrder.taxPrice),
-        totalPrice: String(updatedOrder.totalPrice),
-        shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
-        paymentResult: updatedOrder.paymentResult as PaymentResult,
-        orderitems: updatedOrder.orderitems.map((item) => ({
-          ...item,
-          price: String(item.price),
-        })),
-      },
-    });
-  } catch (emailError) {
-    // Log email error but don't fail the payment
-    console.error("Failed to send purchase receipt email:", emailError);
-  }
-};
-
 // Get user orders with pagination
 export const getUserOrders = async ({
   limit = ORDER_ITEMS_PER_PAGE,
@@ -532,9 +505,71 @@ export const deleteOrder = async (id: string) => {
   }
 };
 
+// update order to paid
+export const updateOrderToPaid = async (
+  orderId: string,
+  paymentResult?: {
+    orderId: string;
+    paymentResult?: PaymentResult;
+  }
+) => {
+  // Get order from DB
+  const order = await prisma.order.findFirst({
+    where: { id: orderId },
+    include: { orderitems: true },
+  });
+  if (!order) throw new Error("Order not found");
+
+  if (order.isPaid) {
+    throw new Error("Order is already paid");
+  }
+
+  // Update order to paid (stock already decremented during order creation)
+  await prisma.order.update({
+    where: { id: orderId },
+    data: {
+      isPaid: true,
+      paidAt: new Date(),
+      paymentResult,
+    },
+  });
+
+  // Get updated order after transaction
+  const updatedOrder = await prisma.order.findFirst({
+    where: { id: orderId },
+    include: {
+      orderitems: true,
+      user: { select: { name: true, email: true } },
+    },
+  });
+
+  if (!updatedOrder) throw new Error("Order not found");
+
+  // Send email asynchronously (don't block payment confirmation)
+  try {
+    await sendPurchaseReceiptEmail({
+      order: {
+        ...updatedOrder,
+        itemsPrice: String(updatedOrder.itemsPrice),
+        shippingPrice: String(updatedOrder.shippingPrice),
+        taxPrice: String(updatedOrder.taxPrice),
+        totalPrice: String(updatedOrder.totalPrice),
+        shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
+        paymentResult: updatedOrder.paymentResult as PaymentResult,
+        orderitems: updatedOrder.orderitems.map((item) => ({
+          ...item,
+          price: String(item.price),
+        })),
+      },
+    });
+  } catch (emailError) {
+    // Log email error but don't fail the payment
+    console.error("Failed to send purchase receipt email:", emailError);
+  }
+};
+
 // Update COD order to paid
 export const updateOrderToPaidCOD = async (orderId: string) => {
-  console.log("🟠 updateOrderToPaidCOD called for order:", orderId);
   try {
     await updateOrderToPaid(orderId);
 
@@ -546,6 +581,65 @@ export const updateOrderToPaidCOD = async (orderId: string) => {
     };
   } catch (error) {
     console.error("🔴 Error in updateOrderToPaidCOD:", error);
+    return {
+      success: false,
+      message: renderError(error),
+    };
+  }
+};
+
+// Cancel order and restore stock
+export const cancelOrder = async (orderId: string) => {
+  try {
+    const session = await auth();
+    if (!session) throw new Error("User not authenticated");
+
+    const order = await prisma.order.findFirst({
+      where: { id: orderId },
+      include: { orderitems: true },
+    });
+
+    if (!order) throw new Error("Order not found");
+
+    // Only allow cancellation if order is not paid or not delivered
+    if (order.isPaid && order.isDelivered) {
+      throw new Error("Cannot cancel a delivered order");
+    }
+
+    // Check if user is authorized (order owner or admin)
+    const isAdmin = session.user?.role === "admin";
+    const isOwner = order.userId === session.user?.id;
+
+    if (!isAdmin && !isOwner) {
+      throw new Error("Not authorized to cancel this order");
+    }
+
+    // Restore stock in a transaction
+    await prisma.$transaction(async (tx) => {
+      // Restore stock for each item
+      for (const item of order.orderitems) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stockCount: { increment: item.quantity },
+          },
+        });
+      }
+
+      // Delete the order
+      await tx.order.delete({
+        where: { id: orderId },
+      });
+    });
+
+    revalidatePath("/user/orders");
+    revalidatePath("/admin/orders");
+
+    return {
+      success: true,
+      message: "Order cancelled and stock restored",
+    };
+  } catch (error) {
     return {
       success: false,
       message: renderError(error),

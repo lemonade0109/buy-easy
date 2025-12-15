@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import PasswordInput from "@/components/shared/password-input";
 import { resetPassword } from "@/lib/actions/auth/reset-password";
 import React from "react";
 import { useFormStatus } from "react-dom";
@@ -107,9 +108,8 @@ const ResetPasswordForm = ({
 
       <div className="space-y-2">
         <Label htmlFor="password">New Password</Label>
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
           name="password"
           placeholder="Enter your new password"
           autoComplete="new-password"
@@ -169,9 +169,8 @@ const ResetPasswordForm = ({
 
       <div className="space-y-2">
         <Label htmlFor="confirmPassword">Confirm New Password</Label>
-        <Input
+        <PasswordInput
           id="confirmPassword"
-          type="password"
           name="confirmPassword"
           placeholder="Confirm your new password"
           autoComplete="new-password"

@@ -12,6 +12,7 @@ import { getCartItems } from "@/lib/actions/cart/cart-actions";
 import ReviewList from "./review-list";
 import { auth } from "@/auth";
 import Rating from "@/components/shared/product/rating";
+import StockBadge from "@/components/shared/product/stock-badge";
 
 export default async function ProductDetailsPage(props: {
   params: Promise<{ slug: string }>;
@@ -71,12 +72,15 @@ export default async function ProductDetailsPage(props: {
 
                 <div className="mb-2 flex justify-between">
                   <div className="">Status</div>
-                  {product.stockCount > 0 ? (
-                    <Badge variant="outline">In Stock</Badge>
-                  ) : (
-                    <Badge variant="destructive">Out of Stock</Badge>
-                  )}
+                  <StockBadge stockCount={product.stockCount ?? 0} />
                 </div>
+
+                {product.stockCount > 0 && product.stockCount <= 10 && (
+                  <div className="mb-2 text-sm text-orange-600">
+                    Only {product.stockCount} left in stock - order soon!
+                  </div>
+                )}
+
                 {product.stockCount > 0 && product.id && (
                   <AddToCart
                     cart={cart}

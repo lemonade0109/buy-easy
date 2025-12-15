@@ -1,11 +1,7 @@
 "use server";
 import { auth } from "@/auth";
 import { prisma } from "@/db/prisma";
-import {
-  convertToPlainObject,
-  renderError,
-  roundToTwoDecimalPlaces,
-} from "@/lib/utils";
+import { convertToPlainObject, roundToTwoDecimalPlaces } from "@/lib/utils";
 import {
   cartItemSchema,
   insertCartSchema,
@@ -55,7 +51,11 @@ export async function addToCart(data: CartItem) {
     });
 
     if (!product) {
-      throw new Error("Product not found");
+      return { success: false, message: "Product not found" };
+    }
+
+    if (product.stockCount < 1) {
+      return { success: false, message: "Not enough stock available" };
     }
 
     if (!cartItems) {
@@ -77,64 +77,57 @@ export async function addToCart(data: CartItem) {
         success: true,
         message: `${product.name} added to cart`,
       };
-    } else {
-      // Check If Item Is Already In Cart
-      const existingItem = (cartItems.items as CartItem[]).find(
-        (x) => x.productId === validatedItem.productId
-      );
+    }
 
-      if (existingItem) {
-        // Check stock
-        if (product.stockCount < existingItem.quantity + 1) {
-          throw new Error("Not enough stock");
-        }
+    const items = cartItems.items as CartItem[];
+    const existingItem = items.find(
+      (item) => item.productId === validatedItem.productId
+    );
 
-        // Increase the quantity
-        (cartItems.items as CartItem[]).find(
-          (x) => x.productId === validatedItem.productId
-        )!.quantity = existingItem.quantity + 1;
-      } else {
-        // If Items Does Not Exist In Cart
-        //Check stock
-        if (product.stockCount < 1) throw new Error("Not enough stock");
-
-        //Add new item to cart
-        (cartItems.items as CartItem[]).push(validatedItem);
+    if (existingItem) {
+      const newQuantity = existingItem.quantity + validatedItem.quantity;
+      if (newQuantity > product.stockCount) {
+        return {
+          success: false,
+          message: `Only ${product.stockCount} left in stock for ${product.name}`,
+        };
       }
 
-      //Save to DB
-      await prisma.cart.update({
-        where: { id: cartItems.id },
-        data: {
-          items: cartItems.items,
-          ...calcPrices(cartItems.items as CartItem[]),
-        },
-      });
-
-      revalidatePath(`/product/${product.slug}`);
-
-      return {
-        success: true,
-        message: `${product.name} ${
-          existingItem ? "has been updated in" : "has been added to"
-        } cart`,
-      };
+      existingItem.quantity = newQuantity;
+    } else {
+      items.push(validatedItem);
     }
+    //Save to DB
+    await prisma.cart.update({
+      where: { id: cartItems.id },
+      data: {
+        items: cartItems.items,
+        ...calcPrices(cartItems.items as CartItem[]),
+      },
+    });
+
+    revalidatePath(`/product/${product.slug}`);
+
+    return {
+      success: true,
+      message: `${product.name} ${
+        existingItem ? "has been updated in" : "has been added to"
+      } cart`,
+    };
   } catch (error) {
-    // Log the actual error for debugging
     console.error("[Cart Error - addToCart]:", error);
 
-    // Return user-friendly messages for known errors
-    if (error instanceof Error) {
-      if (error.message === "Product not found") {
-        return { success: false, message: "Product not found" };
-      }
-      if (error.message === "Not enough stock") {
-        return { success: false, message: "Not enough stock available" };
-      }
+    if (
+      error instanceof Error &&
+      error.message === "No session cart ID found"
+    ) {
+      return {
+        success: false,
+        message:
+          "Cart session not found. Please refresh the page and try again.",
+      };
     }
 
-    // Generic message for unexpected errors
     return {
       success: false,
       message: "Something went wrong. Please try again.",

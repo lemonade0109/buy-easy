@@ -1,5 +1,6 @@
 "use client";
 
+import PasswordInput from "@/components/shared/password-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -99,11 +100,10 @@ const SignUpForm = () => {
 
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
           name="password"
-          autoComplete="password"
+          autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           onFocus={() => setShowPasswordStrength(true)}
@@ -160,11 +160,10 @@ const SignUpForm = () => {
 
       <div className="space-y-2">
         <Label htmlFor="confirmPassword">Confirm Password</Label>
-        <Input
+        <PasswordInput
           id="confirmPassword"
-          type="password"
           name="confirmPassword"
-          autoComplete="confirmPassword"
+          autoComplete="new-password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           onFocus={() => setShowConfirmPassword(true)}
