@@ -7,7 +7,7 @@ import { handleLogout } from "@/lib/utils";
 
 const LogoutButton = () => {
   return (
-    <Button onClick={handleLogout} className="w-full" variant="ghost">
+    <Button onClick={handleLogout} className="w-full">
       <UserIcon /> Sign Out
     </Button>
   );

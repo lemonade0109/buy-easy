@@ -41,7 +41,6 @@ const MenuBar = async () => {
           <SheetContent className="flex flex-col items-start gap-4 p-6">
             <SheetTitle className="">Menu</SheetTitle>
 
-            <ModeToggler />
             <Button asChild variant={"ghost"} className="w-full">
               <Link href="/cart">
                 <ShoppingCart /> Cart

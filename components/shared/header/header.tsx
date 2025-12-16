@@ -7,6 +7,7 @@ import MenuBar from "./menu";
 import CategoryDrawer from "./category-drawer";
 import SearchBar from "./search";
 import MobileSearchWrapper from "./mobile-search-wrapper";
+import ModeToggler from "./mode-toggler";
 
 const Header = () => {
   return (
@@ -29,6 +30,9 @@ const Header = () => {
           <SearchBar />
         </div>
         <div className="flex items-center gap-2">
+          <div className="md:hidden">
+            <ModeToggler />
+          </div>
           <MobileSearchWrapper />
           <MenuBar />
         </div>
