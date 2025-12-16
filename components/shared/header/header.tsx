@@ -6,6 +6,7 @@ import { APP_NAME } from "@/lib/constants";
 import MenuBar from "./menu";
 import CategoryDrawer from "./category-drawer";
 import SearchBar from "./search";
+import MobileSearchWrapper from "./mobile-search-wrapper";
 
 const Header = () => {
   return (
@@ -24,10 +25,13 @@ const Header = () => {
             <span className="hidden lg:block font-bold text-2xl ml-3"></span>
           </Link>
         </div>
-        <div className="hidden md:block">
+        <div className="hidden md:block w-full max-w-md">
           <SearchBar />
         </div>
-        <MenuBar />
+        <div className="flex items-center gap-2">
+          <MobileSearchWrapper />
+          <MenuBar />
+        </div>
       </div>
     </header>
   );

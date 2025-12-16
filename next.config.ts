@@ -13,13 +13,16 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    // Increase timeout for slow image responses
     unoptimized: false,
+    // Add device sizes and image sizes for better optimization
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Increase formats for better compatibility
+    formats: ["image/webp"],
   },
   // Increase server timeout for image optimization
   experimental: {
     serverMinification: true,
-    proxyTimeout: 120000, // 2 minutes
   },
 };
 

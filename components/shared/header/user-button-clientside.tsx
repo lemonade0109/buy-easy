@@ -10,9 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { signOutUser } from "@/lib/actions/users/user-actions";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { handleLogout } from "@/lib/utils";
 
 const UserButtonClientSide = ({
   firstInitial,
@@ -27,15 +25,6 @@ const UserButtonClientSide = ({
 }) => {
   const [open, setOpen] = React.useState(false);
 
-  const handleLogout = async () => {
-    try {
-      await signOutUser();
-      toast.success("You have been signed out.");
-      window.location.href = "/";
-    } catch (error) {
-      toast.error("Failed to sign out. Please try again.");
-    }
-  };
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>

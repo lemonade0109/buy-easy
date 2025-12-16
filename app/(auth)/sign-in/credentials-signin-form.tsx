@@ -31,10 +31,12 @@ const CredentialsSignInForm = () => {
   };
 
   return (
-    <form className="space-y-6" action={action}>
+    <form className="space-y-4 sm:space-y-6" action={action}>
       <input type="hidden" name="callbackUrl" value={callbackUrl} />
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email" className="text-sm sm:text-base">
+          Email
+        </Label>
         <Input
           id="email"
           type="email"
@@ -42,16 +44,20 @@ const CredentialsSignInForm = () => {
           autoComplete="email"
           defaultValue={signInDefaultValues.email}
           required
+          className="text-sm sm:text-base"
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password" className="text-sm sm:text-base">
+          Password
+        </Label>
         <PasswordInput
           id="password"
           name="password"
           autoComplete="password"
           required
           defaultValue={signInDefaultValues.password}
+          className="text-sm sm:text-base"
         />
       </div>
       <div>
@@ -59,16 +65,16 @@ const CredentialsSignInForm = () => {
       </div>
 
       {data && !data.success && (
-        <div className="text-center text-destructive">
+        <div className="text-center text-destructive text-xs sm:text-sm">
           {asStringMessage((data as { message?: unknown }).message)}
         </div>
       )}
 
-      <div className="text-sm text-center text-muted-foreground flex flex-col gap-2 justify-center">
+      <div className="text-xs sm:text-sm text-center text-muted-foreground flex flex-col gap-2 justify-center">
         <span>
           <Link
             href="/forgot-password"
-            className="hover:underline hover:text-blue-500 text-blue-500 text-sm"
+            className="hover:underline hover:text-blue-500 text-blue-500"
           >
             Forgot your password?
           </Link>

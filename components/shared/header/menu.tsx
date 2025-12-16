@@ -10,8 +10,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import UserButton from "./user-Button";
+import { auth } from "@/auth";
+import LogoutButton from "./logout-button";
 
-const MenuBar = () => {
+const MenuBar = async () => {
+  const session = await auth();
+  const user = session?.user;
+
   return (
     <div className="flex justify-end gap-3">
       <nav className="hidden md:flex w-full max-w-xs gap-1">
@@ -33,8 +38,8 @@ const MenuBar = () => {
             <EllipsisVertical />
           </SheetTrigger>
 
-          <SheetContent className="flex flex-col items-start">
-            <SheetTitle>Menu</SheetTitle>
+          <SheetContent className="flex flex-col items-start gap-4 p-6">
+            <SheetTitle className="">Menu</SheetTitle>
 
             <ModeToggler />
             <Button asChild variant={"ghost"} className="w-full">
@@ -43,11 +48,15 @@ const MenuBar = () => {
               </Link>
             </Button>
 
-            <Button asChild className="w-full">
-              <Link href="/sign-in">
-                <UserIcon /> Sign In
-              </Link>
-            </Button>
+            {user ? (
+              <LogoutButton />
+            ) : (
+              <Button asChild className="w-full">
+                <Link href="/sign-in">
+                  <UserIcon /> Sign In
+                </Link>
+              </Button>
+            )}
           </SheetContent>
         </Sheet>
       </nav>

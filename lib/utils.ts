@@ -2,6 +2,8 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import qs from "query-string";
 import countries from "world-countries";
+import { signOutUser } from "./actions/users/user-actions";
+import toast from "react-hot-toast";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -182,4 +184,15 @@ export const formattedCountries = countries.map((country) => {
 
 export const findCountryByCode = (code: string) => {
   return formattedCountries.find((country) => country.code === code);
+};
+
+export const handleLogout = async () => {
+  try {
+    await signOutUser();
+    toast.success("You have been signed out.");
+    window.location.href = "/";
+  } catch (_error) {
+    console.log(_error);
+    toast.error("Failed to sign out. Please try again.");
+  }
 };

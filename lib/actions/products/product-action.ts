@@ -28,7 +28,7 @@ export const getLatestProducts = async () => {
         rating: p.rating.toString(),
         // ensure optional numeric fields are concrete values for the frontend
         stockCount: p.stockCount ?? 0,
-      } as unknown as Product)
+      }) as unknown as Product
   );
 
   return convertToPlainObject(mapped);
@@ -168,7 +168,7 @@ export const getAllProducts = async ({
         price: p.price.toString(),
         rating: p.rating.toString(),
         stockCount: p.stockCount ?? 0,
-      } as unknown as Product)
+      }) as unknown as Product
   );
 
   return {
@@ -212,10 +212,16 @@ export const createProduct = async (data: Product) => {
     };
   } catch (error) {
     // Check for unique constraint violation on slug
-    if (error instanceof Error && error.message.includes('Unique constraint failed on the fields: (`slug`)')) {
+    if (
+      error instanceof Error &&
+      error.message.includes("Unique constraint failed on the fields: (`slug`)")
+    ) {
       return {
         success: false,
-        message: { message: "A product with this slug already exists. Please use a different slug or modify the product name." },
+        message: {
+          message:
+            "A product with this slug already exists. Please use a different slug or modify the product name.",
+        },
       };
     }
     return {
@@ -249,10 +255,16 @@ export const updateProduct = async (
     };
   } catch (error) {
     // Check for unique constraint violation on slug
-    if (error instanceof Error && error.message.includes('Unique constraint failed on the fields: (`slug`)')) {
+    if (
+      error instanceof Error &&
+      error.message.includes("Unique constraint failed on the fields: (`slug`)")
+    ) {
       return {
         success: false,
-        message: { message: "A product with this slug already exists. Please use a different slug." },
+        message: {
+          message:
+            "A product with this slug already exists. Please use a different slug.",
+        },
       };
     }
     return {
@@ -269,7 +281,10 @@ export const getAllCategories = async () => {
     _count: true,
   });
 
-  return data;
+  return data.map((item) => ({
+    category: item.category,
+    _count: item._count,
+  }));
 };
 
 // Get featured products

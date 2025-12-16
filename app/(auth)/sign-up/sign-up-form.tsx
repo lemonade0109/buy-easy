@@ -75,7 +75,9 @@ const SignUpForm = () => {
     <form className="space-y-6" action={action}>
       <input type="hidden" name="callbackUrl" value={callbackUrl} />
       <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name" className="text-sm sm:text-base">
+          Name
+        </Label>
         <Input
           id="name"
           type="text"
@@ -83,11 +85,14 @@ const SignUpForm = () => {
           autoComplete="name"
           defaultValue={signUpDefaultValues.name}
           required
+          className="text-sm sm:text-base"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email" className="text-sm sm:text-base">
+          Email
+        </Label>
         <Input
           id="email"
           type="email"
@@ -95,11 +100,14 @@ const SignUpForm = () => {
           autoComplete="email"
           defaultValue={signUpDefaultValues.email}
           required
+          className="text-sm sm:text-base"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password" className="text-sm sm:text-base">
+          Password
+        </Label>
         <PasswordInput
           id="password"
           name="password"
@@ -109,6 +117,7 @@ const SignUpForm = () => {
           onFocus={() => setShowPasswordStrength(true)}
           onBlur={() => setShowPasswordStrength(false)}
           required
+          className="text-sm sm:text-base"
         />
         {showPasswordStrength && (
           <div className="mt-2">
@@ -134,7 +143,7 @@ const SignUpForm = () => {
             </div>
             {password && (
               <div
-                className={`text-xs mt-1 ${
+                className={`text-xs sm:text-sm mt-1 ${
                   passwordScore <= 2
                     ? "text-red-600"
                     : passwordScore === 3
@@ -149,7 +158,7 @@ const SignUpForm = () => {
             )}
 
             {isTooWeak && (
-              <p className="text-sm text-red-500 mt-1">
+              <p className="text-sm sm:text-base text-red-500 mt-1">
                 Please use at least 8 characters with lowercase, uppercase,
                 number and a special character.
               </p>
@@ -159,7 +168,9 @@ const SignUpForm = () => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Confirm Password</Label>
+        <Label htmlFor="confirmPassword" className="text-sm sm:text-base">
+          Confirm Password
+        </Label>
         <PasswordInput
           id="confirmPassword"
           name="confirmPassword"
@@ -169,11 +180,12 @@ const SignUpForm = () => {
           onFocus={() => setShowConfirmPassword(true)}
           onBlur={() => setShowConfirmPassword(false)}
           required
+          className="text-sm sm:text-base"
         />
 
         {showConfirmPassword && confirmPassword.length > 0 && (
           <p
-            className={`mt-1 text-xs ${
+            className={`mt-1 text-xs sm:text-sm ${
               passwordMatch ? "text-green-500" : "text-red-500"
             }`}
           >
@@ -188,12 +200,12 @@ const SignUpForm = () => {
       </div>
 
       {data && !data.success && (
-        <div className="text-center text-destructive">
+        <div className="text-center text-destructive text-sm sm:text-base">
           {asStringMessage((data as { message?: unknown }).message)}
         </div>
       )}
 
-      <div className="text-sm text-center text-muted-foreground">
+      <div className="text-sm text-center text-muted-foreground sm:text-base">
         Already have an account?{" "}
         <Link href="/sign-in" className="text-blue-500 hover:underline">
           Sign In
