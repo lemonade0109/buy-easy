@@ -7,7 +7,10 @@ import {
 import Link from "next/link";
 import React from "react";
 import SortSelect from "@/components/shared/sort-select";
-import { isProductInWishlist } from "@/lib/actions/wishlists/wishlist";
+import Breadcrumbs from "@/components/shared/Breadcrumbs";
+import MobileFilters from "@/components/shared/mobile-filters";
+import MobileSort from "@/components/shared/mobile-sort";
+import Pagination from "@/components/shared/pagination";
 
 const prices = [
   {
@@ -142,132 +145,180 @@ export default async function SearchPage(props: {
   const categories = await getAllCategories();
 
   return (
-    <div className="grid md:grid-cols-5 md:gap-5">
-      <div className="filter-links">
-        {/* Category links */}
-        <div className="text-xl mb-2 mt-3 font-bold">Department</div>
+    <div className="px-4 md:px-0 md:py-4">
+      <div className="grid md:grid-cols-5 md:gap-5">
+        <div className="hidden md:block">
+          <div className="filter-links">
+            {/* Category links */}
+            <div className="text-lg md:text-xl mb-2 mt-3 font-bold">
+              Department
+            </div>
 
-        <div>
-          <ul className="space-y-1">
-            <li>
-              <Link
-                className={`${
-                  (category === "all" || category === "") && "font-bold"
-                }`}
-                href={getFilterUrl({ c: "all" })}
-              >
-                Any
-              </Link>
-            </li>
+            <div>
+              <ul className="space-y-1 text-sm md:text-base">
+                <li>
+                  <Link
+                    className={`${
+                      (category === "all" || category === "") && "font-bold"
+                    } hover:underline`}
+                    href={getFilterUrl({ c: "all" })}
+                  >
+                    Any
+                  </Link>
+                </li>
 
-            {categories.map((cat) => (
-              <li key={cat.category}>
-                <Link
-                  className={`${category === cat.category && "font-bold"}`}
-                  href={getFilterUrl({ c: cat.category })}
-                >
-                  {cat.category}
-                </Link>
-              </li>
-            ))}
-          </ul>
+                {categories.map((cat) => (
+                  <li key={cat.category}>
+                    <Link
+                      className={`${
+                        category === cat.category && "font-bold"
+                      } hover:underline`}
+                      href={getFilterUrl({ c: cat.category })}
+                    >
+                      {cat.category}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Price links */}
+            <div className="text-lg md:text-xl mb-2 mt-8 font-bold">Price</div>
+
+            <div>
+              <ul className="space-y-1 text-sm md:text-base">
+                <li>
+                  <Link
+                    className={`${
+                      (price === "all" || price === "") && "font-bold"
+                    } hover:underline`}
+                    href={getFilterUrl({ p: "all" })}
+                  >
+                    Any
+                  </Link>
+                </li>
+
+                {prices.map((priceRange) => (
+                  <li key={priceRange.value}>
+                    <Link
+                      className={`${
+                        price === priceRange.value && "font-bold"
+                      } hover:underline`}
+                      href={getFilterUrl({ p: priceRange.value })}
+                    >
+                      {priceRange.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Rating links */}
+            <div className="text-lg md:text-xl mb-2 mt-8 font-bold">Rating</div>
+
+            <div>
+              <ul className="space-y-1 text-sm md:text-base">
+                <li>
+                  <Link
+                    className={`${
+                      (rating === "all" || rating === "") && "font-bold"
+                    } hover:underline`}
+                    href={getFilterUrl({ r: "all" })}
+                  >
+                    Any
+                  </Link>
+                </li>
+
+                {ratings.map((ratingValue) => (
+                  <li key={ratingValue}>
+                    <Link
+                      className={`${
+                        rating === ratingValue.toString() && "font-bold"
+                      } hover:underline`}
+                      href={getFilterUrl({ r: ratingValue.toString() })}
+                    >
+                      {`${ratingValue} stars & up`}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
 
-        {/* Price links */}
-        <div className="text-xl mb-2 mt-8 font-bold">Price</div>
-
-        <div>
-          <ul className="space-y-1">
-            <li>
-              <Link
-                className={`${
-                  (price === "all" || price === "") && "font-bold"
-                }`}
-                href={getFilterUrl({ p: "all" })}
-              >
-                Any
-              </Link>
-            </li>
-
-            {prices.map((priceRange) => (
-              <li key={priceRange.value}>
-                <Link
-                  className={`${price === priceRange.value && "font-bold"}`}
-                  href={getFilterUrl({ p: priceRange.value })}
-                >
-                  {priceRange.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Rating links */}
-        <div className="text-xl mb-2 mt-8 font-bold">Rating</div>
-
-        <div>
-          <ul className="space-y-1">
-            <li>
-              <Link
-                className={`${
-                  (rating === "all" || rating === "") && "font-bold"
-                }`}
-                href={getFilterUrl({ r: "all" })}
-              >
-                Any
-              </Link>
-            </li>
-
-            {ratings.map((ratingValue) => (
-              <li key={ratingValue}>
-                <Link
-                  className={`${
-                    rating === ratingValue.toString() && "font-bold"
-                  }`}
-                  href={getFilterUrl({ r: ratingValue.toString() })}
-                >
-                  {`${ratingValue} stars & up`}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div className="md:col-span-4 space-y-4">
-        <div className="flex-between flex-col md:flex-row my-4">
-          <div className="flex items-center">
-            {q !== "all" && q !== "" && " Query: " + q}
-            {category !== "all" && category !== "" && " Category: " + category}
-            {price !== "all" && price !== "" && " Price: " + price}
-            {rating !== "all" && rating !== "" && " Rating: " + rating}
+        <div className="md:col-span-4 space-y-3 md:space-y-4">
+          <div className="flex items-center justify-between gap-4 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
+            <div className="min-w-max">
+              <Breadcrumbs
+                name={
+                  category !== "all" && category !== ""
+                    ? category
+                    : "All Categories"
+                }
+                category="Search Results"
+              />
+            </div>
             {(q !== "all" && q !== "") ||
             (category !== "all" && category !== "") ||
             (price !== "all" && price !== "") ||
             (rating !== "all" && rating !== "") ? (
-              <Button variant={"link"} asChild>
+              <Button variant={"link"} asChild className="shrink-0">
                 <Link href="/search">Clear</Link>
               </Button>
             ) : null}
           </div>
-          <div>
-            {/* SORT */}
-            <SortSelect sortOptions={sortOptions} currentSort={sort} />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {products.data.length === 0 && <div>No products found.</div>}
 
-          {products.data.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={{
-                ...product,
-                price: product.price.toString(),
-                rating: product.rating?.toString() || "0",
-              }}
+          {/* Mobile Filter and Sort Buttons */}
+          <div className="flex justify-between md:hidden">
+            <MobileFilters
+              categories={categories}
+              prices={prices}
+              ratings={ratings}
+              currentCategory={category}
+              currentPrice={price}
+              currentRating={rating}
+              currentSort={sort}
+              currentPage={page}
             />
-          ))}
+            <MobileSort sortOptions={sortOptions} currentSort={sort} />
+          </div>
+
+          {/* Desktop Sort */}
+          <div className="hidden md:flex justify-end">
+            <div className="w-full md:w-auto">
+              <SortSelect sortOptions={sortOptions} currentSort={sort} />
+            </div>
+          </div>
+
+          {/* Products Grid */}
+          <div className="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-3 lg:grid-cols-4">
+            {products.data.length === 0 && (
+              <div className="col-span-2 md:col-span-3 lg:col-span-4 text-center py-8 text-sm md:text-base">
+                No products found.
+              </div>
+            )}
+
+            {products.data.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={{
+                  ...product,
+                  price: product.price.toString(),
+                  rating: product.rating?.toString() || "0",
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {products.totalPages > 1 && (
+            <div className="pb-4 md:pb-0">
+              <Pagination
+                page={Number(page)}
+                totalPages={products.totalPages}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
