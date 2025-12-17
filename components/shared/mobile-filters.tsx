@@ -6,10 +6,10 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 import { Filter } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
 interface MobileFiltersProps {
   categories: { category: string }[];
@@ -62,7 +62,7 @@ export default function MobileFilters({
           Filters
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[300px] overflow-y-auto">
+      <SheetContent side="left" className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Filters</SheetTitle>
         </SheetHeader>
@@ -72,26 +72,30 @@ export default function MobileFilters({
             <div className="text-base font-bold mb-3">Department</div>
             <ul className="space-y-2">
               <li>
-                <Link
-                  className={`${
-                    (currentCategory === "all" || currentCategory === "") &&
-                    "font-bold"
-                  } hover:underline text-sm`}
-                  href={getFilterUrl({ c: "all" })}
-                >
-                  Any
-                </Link>
+                <SheetClose asChild>
+                  <Link
+                    className={`$${
+                      (currentCategory === "all" || currentCategory === "") &&
+                      "font-bold"
+                    } hover:underline text-sm`}
+                    href={getFilterUrl({ c: "all" })}
+                  >
+                    Any
+                  </Link>
+                </SheetClose>
               </li>
               {categories.map((cat) => (
                 <li key={cat.category}>
-                  <Link
-                    className={`${
-                      currentCategory === cat.category && "font-bold"
-                    } hover:underline text-sm`}
-                    href={getFilterUrl({ c: cat.category })}
-                  >
-                    {cat.category}
-                  </Link>
+                  <SheetClose asChild>
+                    <Link
+                      className={`$${
+                        currentCategory === cat.category && "font-bold"
+                      } hover:underline text-sm`}
+                      href={getFilterUrl({ c: cat.category })}
+                    >
+                      {cat.category}
+                    </Link>
+                  </SheetClose>
                 </li>
               ))}
             </ul>
@@ -102,26 +106,30 @@ export default function MobileFilters({
             <div className="text-base font-bold mb-3">Price</div>
             <ul className="space-y-2">
               <li>
-                <Link
-                  className={`${
-                    (currentPrice === "all" || currentPrice === "") &&
-                    "font-bold"
-                  } hover:underline text-sm`}
-                  href={getFilterUrl({ p: "all" })}
-                >
-                  Any
-                </Link>
+                <SheetClose asChild>
+                  <Link
+                    className={`$${
+                      (currentPrice === "all" || currentPrice === "") &&
+                      "font-bold"
+                    } hover:underline text-sm`}
+                    href={getFilterUrl({ p: "all" })}
+                  >
+                    Any
+                  </Link>
+                </SheetClose>
               </li>
               {prices.map((priceRange) => (
                 <li key={priceRange.value}>
-                  <Link
-                    className={`${
-                      currentPrice === priceRange.value && "font-bold"
-                    } hover:underline text-sm`}
-                    href={getFilterUrl({ p: priceRange.value })}
-                  >
-                    {priceRange.name}
-                  </Link>
+                  <SheetClose asChild>
+                    <Link
+                      className={`$${
+                        currentPrice === priceRange.value && "font-bold"
+                      } hover:underline text-sm`}
+                      href={getFilterUrl({ p: priceRange.value })}
+                    >
+                      {priceRange.name}
+                    </Link>
+                  </SheetClose>
                 </li>
               ))}
             </ul>
@@ -132,26 +140,30 @@ export default function MobileFilters({
             <div className="text-base font-bold mb-3">Rating</div>
             <ul className="space-y-2">
               <li>
-                <Link
-                  className={`${
-                    (currentRating === "all" || currentRating === "") &&
-                    "font-bold"
-                  } hover:underline text-sm`}
-                  href={getFilterUrl({ r: "all" })}
-                >
-                  Any
-                </Link>
+                <SheetClose asChild>
+                  <Link
+                    className={`$${
+                      (currentRating === "all" || currentRating === "") &&
+                      "font-bold"
+                    } hover:underline text-sm`}
+                    href={getFilterUrl({ r: "all" })}
+                  >
+                    Any
+                  </Link>
+                </SheetClose>
               </li>
               {ratings.map((ratingValue) => (
                 <li key={ratingValue}>
-                  <Link
-                    className={`${
-                      currentRating === ratingValue.toString() && "font-bold"
-                    } hover:underline text-sm`}
-                    href={getFilterUrl({ r: ratingValue.toString() })}
-                  >
-                    {`${ratingValue} stars & up`}
-                  </Link>
+                  <SheetClose asChild>
+                    <Link
+                      className={`$${
+                        currentRating === ratingValue.toString() && "font-bold"
+                      } hover:underline text-sm`}
+                      href={getFilterUrl({ r: ratingValue.toString() })}
+                    >
+                      {`${ratingValue} stars & up`}
+                    </Link>
+                  </SheetClose>
                 </li>
               ))}
             </ul>

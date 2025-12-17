@@ -8,9 +8,9 @@ import Link from "next/link";
 import React from "react";
 import SortSelect from "@/components/shared/sort-select";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
-import MobileFilters from "@/components/shared/mobile-filters";
 import MobileSort from "@/components/shared/mobile-sort";
 import Pagination from "@/components/shared/pagination";
+import MobileFilters from "@/components/shared/mobile-filters";
 
 const prices = [
   {

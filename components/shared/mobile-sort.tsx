@@ -6,6 +6,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 import { ArrowUpDown } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -34,6 +35,11 @@ export default function MobileSort({
     params.set("sort", value);
     params.set("page", "1");
     router.push(`/search?${params.toString()}`);
+    // Close the sheet after sort
+    const closeBtn = document.querySelector(
+      '[data-slot="sheet-close"]'
+    ) as HTMLElement;
+    if (closeBtn) closeBtn.click();
   };
 
   return (
@@ -55,7 +61,9 @@ export default function MobileSort({
                 key={option.value}
                 className="flex items-center space-x-3 mb-4"
               >
-                <RadioGroupItem value={option.value} id={option.value} />
+                <SheetClose asChild>
+                  <RadioGroupItem value={option.value} id={option.value} />
+                </SheetClose>
                 <Label
                   htmlFor={option.value}
                   className="text-base cursor-pointer"
