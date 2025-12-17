@@ -65,7 +65,7 @@ const ReviewList = ({
           to write a review.
         </div>
       )}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 max-w-4xl">
         {/* Reviews here */}
         {reviews.map((review) => (
           <Card key={review.id}>
@@ -77,7 +77,7 @@ const ReviewList = ({
             </CardHeader>
 
             <CardContent>
-              <div className="flex space-x-2 md:space-x-4 text-sm text-muted-foreground">
+              <div className="flex flex-wrap gap-2 md:gap-4 text-sm text-muted-foreground">
                 <Rating value={review.rating} />
 
                 <div className="flex items-center">
@@ -88,7 +88,7 @@ const ReviewList = ({
                 </div>
                 <div className="flex items-center">
                   <Calendar className="mr-1 h-3 w-3" />
-                  <span className="text-xs md:text-sm max-w-[150px] md:max-w-none truncate">
+                  <span className="text-xs md:text-sm">
                     {formatDateTime(review.createdAt).formattedDateTime}
                   </span>
                 </div>
