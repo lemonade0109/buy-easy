@@ -82,7 +82,7 @@ const DealCountdown = () => {
     );
   }
   return (
-    <section className="grid grid-cols-1 md:grid-cols-2 my-20">
+    <section className="grid grid-cols-1 space-y-4 md:space-y-0 md:grid-cols-2 my-20">
       <div className="flex flex-col gap-2 justify-center">
         <h3 className="text-3xl font-bold">Deal Of The Month</h3>
         <p className="text-lg text-muted-foreground">

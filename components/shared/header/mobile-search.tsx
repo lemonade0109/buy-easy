@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { SearchIcon, X } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import SearchBarClient from "./search-client";
@@ -26,19 +26,9 @@ const MobileSearch = ({ categories }: MobileSearchProps) => {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="top-0 translate-y-0 max-w-full w-full rounded-none border-0 border-b p-4 sm:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <DialogTitle className="text-lg font-semibold">
-              Search Products
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setOpen(false)}
-              className="h-8 w-8"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
+          <DialogTitle className="text-lg font-semibold mb-4">
+            Search Products
+          </DialogTitle>
           <SearchBarClient categories={categories} />
         </DialogContent>
       </Dialog>
