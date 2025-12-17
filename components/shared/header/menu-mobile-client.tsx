@@ -40,17 +40,21 @@ const MenuMobileClient = ({ user }: MenuMobileClientProps) => {
 
       <SheetContent className="flex flex-col items-start gap-4 p-4">
         <SheetTitle className="">
-          <div className="flex flex-col space-y-1">
-            <div className="text-sm font-medium leading-none ml-2">
-              {user?.name}
+          {user ? (
+            <div className="flex flex-col space-y-1">
+              <div className="text-sm font-medium leading-none ml-2">
+                {user?.name}
+              </div>
+              <div className="text-muted-foreground leading-none ml-2 text-[12px]">
+                {user?.email}
+              </div>
             </div>
-            <div className="text-muted-foreground leading-none ml-2 text-[12px]">
-              {user?.email}
-            </div>
-          </div>
+          ) : (
+            <UserIcon />
+          )}
         </SheetTitle>
 
-        <div className="space-y-4 mt-6">
+        <div className="space-y-4 mt-6 w-full">
           <Button
             variant={"ghost"}
             className="w-full"
@@ -59,7 +63,7 @@ const MenuMobileClient = ({ user }: MenuMobileClientProps) => {
             Cart
           </Button>
 
-          <LinksDrawerMobile onNavigate={handleNavigation} />
+          {user && <LinksDrawerMobile onNavigate={handleNavigation} />}
           {user ? (
             <LogoutButton />
           ) : (
