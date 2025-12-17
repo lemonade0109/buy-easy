@@ -42,7 +42,7 @@ export default async function ProductDetailsPage(props: {
           <div className="col-span-2 p-5 ">
             <div className="flex flex-col md:gap-6 gap-3">
               <div className="">
-                <p className="text-sm mb-1 text-gray-500">
+                <p className="text-sm mb-1 text-gray-500 dark:text-gray-300">
                   {product.brand} / {product.category}
                 </p>
                 <h1 className="h3-bold">{product.name}</h1>
@@ -64,7 +64,7 @@ export default async function ProductDetailsPage(props: {
               <p className="md:font-semibold font-bold text-lg md:text-base">
                 Description
               </p>
-              <p className="text-gray-700 max-w-prose text-sm mt-2 md:text-base">
+              <p className="text-gray-700 dark:text-gray-300 max-w-prose text-sm mt-2 md:text-base">
                 {product.description}
               </p>
             </div>
