@@ -10,7 +10,7 @@ export default function RootLayout({
     <div className="flex h-screen flex-col">
       <Header />
 
-      <main className="flex-1 wrapper p-4">{children}</main>
+      <main className="flex-1 wrapper p-4 overflow-x-hidden">{children}</main>
 
       <Footer />
     </div>

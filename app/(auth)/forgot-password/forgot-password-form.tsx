@@ -32,16 +32,16 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   // If email was sent successfully, show success message
   if (data && data.success) {
     return (
-      <div className="space-y-6 text-center">
+      <div className="space-y-4 sm:space-y-6 text-center">
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold">Check Your Email</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-xl sm:text-2xl font-bold">Check Your Email</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">
             We&apos;ve sent a password reset link to your email address. Please
             check your inbox and follow the instructions to reset your password.
           </p>
         </div>
 
-        <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm text-left">
+        <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-left">
           <p className="font-medium mb-2">📧 Didn&apos;t receive the email?</p>
           <ul className="space-y-1 text-muted-foreground">
             <li>• Check your spam or junk folder</li>
@@ -63,10 +63,10 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   }
 
   return (
-    <form className="space-y-6" action={action}>
+    <form className="space-y-4 sm:space-y-6" action={action}>
       <div className="space-y-2 text-center">
-        <h2 className="text-2xl font-bold">Forgot Password?</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-xl sm:text-2xl font-bold">Forgot Password?</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground">
           No worries! Enter your email address and we&apos;ll send you a link to
           reset your password.
         </p>

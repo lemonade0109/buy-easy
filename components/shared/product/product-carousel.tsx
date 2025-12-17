@@ -15,7 +15,7 @@ import Image from "next/image";
 const ProductCarousel = ({ data }: { data: Product[] }) => {
   return (
     <Carousel
-      className="w-full mb-12"
+      className="w-full mb-12 overflow-hidden"
       opts={{ loop: true }}
       plugins={[
         Autoplay({
@@ -30,14 +30,15 @@ const ProductCarousel = ({ data }: { data: Product[] }) => {
         {data.map((product: Product) => (
           <CarouselItem key={product.id}>
             <Link href={`/product/${product.slug}`}>
-              <div className="relative mx-auto">
+              <div className="relative mx-auto max-w-full">
                 <Image
                   src={product.banner || "/placeholder-image.jpg"}
                   alt={product.name}
-                  width="0"
-                  height="0"
-                  sizes="100vw"
-                  className="w-full h-auto"
+                  width={1920}
+                  height={1080}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                  className="w-full h-auto object-cover"
+                  priority
                 />
 
                 <div className="absolute inset-0 flex items-end justify-center">

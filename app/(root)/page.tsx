@@ -29,7 +29,7 @@ export default async function Homepage() {
   }));
 
   return (
-    <div className="">
+    <div className="overflow-x-hidden">
       {featuredProducts.length > 0 && (
         <ProductCarousel data={formattedFeaturedProducts} />
       )}

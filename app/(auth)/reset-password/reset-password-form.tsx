@@ -84,10 +84,12 @@ const ResetPasswordForm = ({
   // If password was reset successfully
   if (data && data.success) {
     return (
-      <div className="space-y-6 text-center">
+      <div className="space-y-4 sm:space-y-6 text-center">
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold">Password Reset Successful!</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-xl sm:text-2xl font-bold">
+            Password Reset Successful!
+          </h2>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Your password has been successfully reset. You can now sign in with
             your new password.
           </p>
@@ -103,7 +105,7 @@ const ResetPasswordForm = ({
   }
 
   return (
-    <form className="space-y-6" action={action}>
+    <form className="space-y-4 sm:space-y-6" action={action}>
       <input type="hidden" name="token" value={token} />
 
       <div className="space-y-2">
