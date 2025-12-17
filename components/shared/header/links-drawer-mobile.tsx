@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import React from "react";
 
 const links = [
@@ -9,12 +8,21 @@ const links = [
   { name: "Wishlist", href: "/wishlist" },
 ];
 
-const LinksDrawerMobile = () => {
+interface LinksDrawerMobileProps {
+  onNavigate: (href: string) => void;
+}
+
+const LinksDrawerMobile = ({ onNavigate }: LinksDrawerMobileProps) => {
   return (
     <>
       {links.map((link) => (
-        <Button key={link.name} asChild variant="ghost" className="w-full">
-          <Link href={link.href}>{link.name}</Link>
+        <Button
+          key={link.name}
+          variant="ghost"
+          className="w-full"
+          onClick={() => onNavigate(link.href)}
+        >
+          {link.name}
         </Button>
       ))}
     </>

@@ -2,17 +2,10 @@ import React from "react";
 import ModeToggler from "./mode-toggler";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { EllipsisVertical, ShoppingCart, UserIcon } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { ShoppingCart } from "lucide-react";
 import UserButton from "./user-Button";
 import { auth } from "@/auth";
-import LogoutButton from "./logout-button";
-import LinksDrawerMobile from "./links-drawer-mobile";
+import MenuMobileClient from "./menu-mobile-client";
 
 const MenuBar = async () => {
   const session = await auth();
@@ -34,41 +27,7 @@ const MenuBar = async () => {
       </nav>
 
       <nav className="md:hidden">
-        <Sheet>
-          <SheetTrigger className="align-middle">
-            <EllipsisVertical />
-          </SheetTrigger>
-
-          <SheetContent className="flex flex-col items-start gap-4 p-4">
-            <SheetTitle className="">
-              <div className="flex flex-col space-y-1">
-                <div className="text-sm font-medium leading-none ml-2">
-                  {user?.name}
-                </div>
-                <div className="text-muted-foreground leading-none ml-2">
-                  {user?.email}
-                </div>
-              </div>
-            </SheetTitle>
-
-            <div className="space-y-4 mt-6">
-              <Button asChild variant={"ghost"} className="w-full">
-                <Link href="/cart">Cart</Link>
-              </Button>
-
-              <LinksDrawerMobile />
-              {user ? (
-                <LogoutButton />
-              ) : (
-                <Button asChild className="w-full">
-                  <Link href="/sign-in">
-                    <UserIcon /> Sign In
-                  </Link>
-                </Button>
-              )}
-            </div>
-          </SheetContent>
-        </Sheet>
+        <MenuMobileClient user={user} />
       </nav>
     </div>
   );
