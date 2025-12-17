@@ -14,46 +14,54 @@ import Image from "next/image";
 
 const ProductCarousel = ({ data }: { data: Product[] }) => {
   return (
-    <Carousel
-      className="w-full mb-12 overflow-hidden"
-      opts={{ loop: true }}
-      plugins={[
-        Autoplay({
-          delay: 4000, // 4 seconds - much more reasonable for reading
-          stopOnInteraction: false, // Don't stop permanently on interaction
-          stopOnMouseEnter: true, // Pause on hover
-          stopOnLastSnap: false, // Continue looping
-        }),
-      ]}
-    >
-      <CarouselContent>
-        {data.map((product: Product) => (
-          <CarouselItem key={product.id}>
-            <Link href={`/product/${product.slug}`}>
-              <div className="relative mx-auto max-w-full">
-                <Image
-                  src={product.banner || "/placeholder-image.jpg"}
-                  alt={product.name}
-                  width={1920}
-                  height={1080}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                  className="w-full h-auto object-cover"
-                  priority
-                />
+    <div className="w-full overflow-hidden">
+      <Carousel
+        className="w-full mb-12"
+        opts={{ loop: true }}
+        plugins={[
+          Autoplay({
+            delay: 4000, // 4 seconds - much more reasonable for reading
+            stopOnInteraction: false, // Don't stop permanently on interaction
+            stopOnMouseEnter: true, // Pause on hover
+            stopOnLastSnap: false, // Continue looping
+          }),
+        ]}
+      >
+        <CarouselContent className="-ml-0">
+          {data.map((product: Product) => (
+            <CarouselItem key={product.id} className="pl-0 min-w-0">
+              <Link href={`/product/${product.slug}`} className="block">
+                <div className="relative w-full overflow-hidden">
+                  <Image
+                    src={product.banner || "/placeholder-image.jpg"}
+                    alt={product.name}
+                    width={1920}
+                    height={1080}
+                    sizes="100vw"
+                    className="w-full h-auto max-w-full block"
+                    priority
+                    quality={85}
+                    style={{
+                      objectFit: "cover",
+                      maxWidth: "100%",
+                      height: "auto",
+                    }}
+                  />
 
-                <div className="absolute inset-0 flex items-end justify-center">
-                  <h2 className="bg-gray-900 bg-opacity-50 text-xl font-bold px-2 text-white">
-                    {product.name}
-                  </h2>
+                  <div className="absolute inset-0 flex items-end justify-center">
+                    <h2 className="bg-gray-900 bg-opacity-50 text-xl font-bold px-2 text-white">
+                      {product.name}
+                    </h2>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious className="hidden sm:inline-flex" />
-      <CarouselNext className="hidden sm:inline-flex" />
-    </Carousel>
+              </Link>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="hidden sm:inline-flex" />
+        <CarouselNext className="hidden sm:inline-flex" />
+      </Carousel>
+    </div>
   );
 };
 
