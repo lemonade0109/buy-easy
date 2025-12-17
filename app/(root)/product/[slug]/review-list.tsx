@@ -77,15 +77,20 @@ const ReviewList = ({
             </CardHeader>
 
             <CardContent>
-              <div className="flex space-x-4 text-sm text-muted-foreground">
+              <div className="flex space-x-2 md:space-x-4 text-sm text-muted-foreground">
                 <Rating value={review.rating} />
+
                 <div className="flex items-center">
                   <User className="mr-1 h-3 w-3" />
-                  {review.user ? review.user.name : "User"}
+                  <span className="text-xs md:text-sm max-w-[150px] md:max-w-none truncate">
+                    {review.user ? review.user.name : "User"}
+                  </span>
                 </div>
                 <div className="flex items-center">
                   <Calendar className="mr-1 h-3 w-3" />
-                  {formatDateTime(review.createdAt).formattedDateTime}
+                  <span className="text-xs md:text-sm max-w-[150px] md:max-w-none truncate">
+                    {formatDateTime(review.createdAt).formattedDateTime}
+                  </span>
                 </div>
               </div>
             </CardContent>

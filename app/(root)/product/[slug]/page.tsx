@@ -1,6 +1,4 @@
 import React from "react";
-import { Badge } from "@/components/ui/badge";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { notFound } from "next/navigation";
 
@@ -13,6 +11,7 @@ import ReviewList from "./review-list";
 import { auth } from "@/auth";
 import Rating from "@/components/shared/product/rating";
 import StockBadge from "@/components/shared/product/stock-badge";
+import Breadcrumbs from "@/components/shared/Breadcrumbs";
 
 export default async function ProductDetailsPage(props: {
   params: Promise<{ slug: string }>;
@@ -23,27 +22,35 @@ export default async function ProductDetailsPage(props: {
   if (!product) notFound();
 
   const session = await auth();
-  const userId = session?.user?.id;
+  const user = session?.user;
 
   const cart = await getCartItems();
   return (
     <>
       <section>
+        <div className="mb-4 md:hidden">
+          <Breadcrumbs name={product.name} category={product.category} />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-5">
-          {/* Images column */}
           <div className="col-span-2">
+            {/* Images column */}
             <ProductImages images={product.image} />
           </div>
 
           {/* Details Column */}
-          <div className="col-span-2 p-5">
-            <div className="flex flex-col gap-6">
-              <p>
-                {product.brand} {product.category}
-              </p>
-              <h1 className="h3-bold">{product.name}</h1>
-              <Rating value={Number(product.rating) || 0} />
-              <p>{product.numReviews} Reviews</p>
+          <div className="col-span-2 p-5 ">
+            <div className="flex flex-col md:gap-6 gap-3">
+              <div className="">
+                <p className="text-sm mb-1 text-gray-500">
+                  {product.brand} / {product.category}
+                </p>
+                <h1 className="h3-bold">{product.name}</h1>
+              </div>
+              <div className=" mt-4 md:mt-0 space-y-2 ">
+                <Rating value={Number(product.rating) || 0} />
+                <p>{product.numReviews} Reviews</p>
+              </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-center">
                 <ProductPrice
                   value={Number(product.price)}
@@ -54,8 +61,12 @@ export default async function ProductDetailsPage(props: {
               </div>
             </div>
             <div className="mt-10">
-              <p className="font-semibold">Description</p>
-              <p>{product.description}</p>
+              <p className="md:font-semibold font-bold text-lg md:text-base">
+                Description
+              </p>
+              <p className="text-gray-700 max-w-prose text-sm mt-2 md:text-base">
+                {product.description}
+              </p>
             </div>
           </div>
 
@@ -104,7 +115,7 @@ export default async function ProductDetailsPage(props: {
         <span className="text-xl font-bold "> Customer Reviews</span>
         <ReviewList
           productId={product.id || ""}
-          userId={userId || ""}
+          userId={user?.id || ""}
           productSlug={product.slug}
         />
       </section>
