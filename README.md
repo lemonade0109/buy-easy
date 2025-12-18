@@ -36,7 +36,7 @@ BuyEasy is a full-stack, production-ready e-commerce platform built with Next.js
 - 🛒 Shopping cart (session-based for guests, persistent for users)
 - ⭐ Product reviews and ratings
 - 💳 Multiple payment methods: PayPal, Stripe, Cash on Delivery
-- 📧 Automated email receipts (Resend)
+- 📧 Automated email receipts (Google SMTP)
 - 📱 Responsive, mobile-first design with dark mode
 - 🔐 Secure authentication (NextAuth.js)
 - 📦 Order history and wishlist
