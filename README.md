@@ -1,6 +1,19 @@
 # 🛒 BuyEasy - Modern E-Commerce Platform
 
-A full-stack e-commerce application built with Next.js 15, featuring a complete shopping experience with authentication, payments, and admin dashboard.
+BuyEasy is a full-stack, production-ready e-commerce platform built with Next.js 15, TypeScript, and Prisma. It delivers a seamless shopping experience for customers and powerful management tools for admins.
+
+## 🚀 Demo
+
+[Live Demo](https://buy-easy-demo.vercel.app) <!-- Replace with your actual demo link -->
+
+## 📸 Screenshots
+
+<!-- Add screenshots here -->
+
+![Homepage](docs/screenshots/homepage.png)
+![Admin Dashboard](docs/screenshots/admin-dashboard.png)
+
+---
 
 ![Next.js](https://img.shields.io/badge/Next.js-15.5.2-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
@@ -9,27 +22,32 @@ A full-stack e-commerce application built with Next.js 15, featuring a complete 
 
 ## ✨ Features
 
-### Customer Features
+### Customer Experience
 
-- 🛍️ **Product Browsing** - Browse products with advanced filtering (category, price, rating)
-- 🔍 **Search & Sort** - Full-text search with multiple sorting options
-- 🛒 **Shopping Cart** - Session-based cart with persistent user carts
-- ⭐ **Reviews & Ratings** - Submit and view product reviews
-- 💳 **Multiple Payment Methods** - PayPal, Stripe, and Cash on Delivery
-- 📧 **Email Receipts** - Automated purchase receipts via Resend
-- 📱 **Responsive Design** - Mobile-first UI with dark mode support
-- 🔐 **Authentication** - Secure login/signup with NextAuth.js
+- 🛍️ Product browsing with advanced filtering (category, price, rating)
+- 🔍 Full-text search and sorting
+- 🛒 Shopping cart (session-based for guests, persistent for users)
+- ⭐ Product reviews and ratings
+- 💳 Multiple payment methods: PayPal, Stripe, Cash on Delivery
+- 📧 Automated email receipts (Resend)
+- 📱 Responsive, mobile-first design with dark mode
+- 🔐 Secure authentication (NextAuth.js)
+- 📦 Order history and wishlist
 
-### Admin Features
+### Admin Dashboard
 
-- 📊 **Dashboard** - Sales overview with charts (Recharts)
-- 📦 **Product Management** - CRUD operations for products
-- 🖼️ **Image Upload** - Multi-image upload via UploadThing
-- 📋 **Order Management** - View and manage customer orders
-- 👥 **User Management** - Admin role management
-- 📈 **Analytics** - Sales trends and revenue tracking
+- 📊 Sales overview with interactive charts
+- 📦 Product management (CRUD)
+- 🖼️ Multi-image upload (UploadThing)
+- 📋 Order management (mark as paid/delivered)
+- 👥 User management and admin roles
+- 📈 Analytics: sales trends, revenue, customer stats
+- 🛠️ Stock updates and inventory control
+- 🔔 Email notifications for key events
 
-## 🚀 Tech Stack
+---
+
+## 🛠️ Tech Stack
 
 ### Frontend
 
@@ -70,7 +88,7 @@ A full-stack e-commerce application built with Next.js 15, featuring a complete 
   - [Stripe](https://stripe.com) - Payments
   - [Resend](https://resend.com) - Email
 
-## 🛠️ Installation
+## ⚡ Getting Started
 
 ### 1. Clone the repository
 
@@ -284,7 +302,7 @@ This project is licensed under the MIT License.
 
 ## 📞 Support
 
-For support, email your-email@example.com or open an issue on GitHub.
+For support, email jubriloyebamiji@gmail.com or open an issue on GitHub.
 
 ---
 
