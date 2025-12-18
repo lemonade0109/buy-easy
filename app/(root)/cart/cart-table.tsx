@@ -36,7 +36,7 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
         </div>
       ) : (
         <div className="grid md:grid-cols-4 md:gap-5">
-          <div className="overflow-x-auto md:col-span-3">
+          <div className="overflow-x-auto md:col-span-3 ">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -123,8 +123,8 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
             </Table>
           </div>
 
-          <Card>
-            <CardContent className="p-4, gap-4">
+          <Card className="mt-64 md:mt-0">
+            <CardContent className="p-4 gap-4">
               <div className="pb-3 text-xl">
                 Subtotal (
                 {cart.items.reduce((acc, item) => acc + item.quantity, 0)})

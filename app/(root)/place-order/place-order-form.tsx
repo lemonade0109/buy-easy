@@ -28,7 +28,7 @@ export const PlaceOrderForm = () => {
         ) : (
           <Check className="w-4 h-4" />
         )}
-        <span className="ml-2">Place Order</span>
+        <span className="ml-2 text-xl md:text-base">Place Order</span>
       </Button>
     );
   };
