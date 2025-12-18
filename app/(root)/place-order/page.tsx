@@ -61,13 +61,13 @@ export default async function PlaceOrderPage() {
   return (
     <>
       <CheckoutSteps current={3} />
-      <h1 className="py-4 text-2xl">Place Order </h1>
+      <h1 className="py-4 text-2xl font-bold">Place Order </h1>
       <div className="grid md:grid-cols-3 md:gap-5">
         <div className="md:col-span-2 overflow-x-auto space-y-4">
           <Card>
             <CardContent className="p-4 gap-4">
-              <h2 className="text-xl pb-4">Shipping Address</h2>
-              <p>{userAddress.fullName}</p>
+              <h2 className="text-xl pb-4 ">Shipping Address</h2>
+              <p className="text-sm">{userAddress.fullName}</p>
               <p>
                 {userAddress.address} {userAddress.city}{" "}
                 {userAddress.postalCode}, {userAddress.country}
