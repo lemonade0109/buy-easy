@@ -15,7 +15,6 @@ BuyEasy is a full-stack, production-ready e-commerce platform built with Next.js
 ![Homepage](docs/screenshots/homepage3.png)
 ![Product Details Page](docs/screenshots/products-details.png)
 ![Order Page](docs/screenshots/orderpage.png)
-![Admin Dashboard](docs/screenshots/admin-dashboard.png)
 ![Product Search Page](docs/screenshots/searchpage.png)
 ![Shopping Cart Page](docs/screenshots/shoppingcartpage.png)
 ![Admin Product Page](docs/screenshots/admin-product.png)
