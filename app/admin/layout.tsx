@@ -4,6 +4,9 @@ import Link from "next/link";
 import MenuBar from "@/components/shared/header/menu";
 import MainNav from "./main-nav";
 import AdminSearch from "@/components/admin/admin-search";
+import MobileSearchWrapper from "@/components/shared/header/mobile-search-wrapper";
+import ModeToggler from "@/components/shared/header/mode-toggler";
+import MobileNavMenu from "@/components/admin/mobile-nav-menu";
 
 export default function AdminLayout({
   children,
@@ -19,11 +22,26 @@ export default function AdminLayout({
               <Image src="/logo.svg" alt={APP_NAME} width={48} height={48} />
             </Link>
 
-            <MainNav className="mx-6" />
-            <div className="ml-auto flex items-center space-x-4">
-              <AdminSearch />
+            {/* MainNav for md+ screens, SortSelect for mobile */}
+            <div className="hidden md:block">
+              <MainNav className="mx-6" />
+            </div>
+            <div className="block md:hidden ">
+              <MobileNavMenu />
+            </div>
 
-              <MenuBar />
+            <div className="ml-auto flex items-center space-x-4 ">
+              <div className="hidden md:block">
+                <AdminSearch />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="md:hidden">
+                  <ModeToggler />
+                </div>
+                <MobileSearchWrapper />
+                <MenuBar />
+              </div>
             </div>
           </div>
         </div>
