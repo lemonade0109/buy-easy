@@ -75,6 +75,15 @@ export const {
         const t = token as TokenWithRole;
         (session.user as { role?: string }).role = t.role;
         session.user.name = t.name as string;
+
+        // Check if user still exists in DB
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.sub as string },
+        });
+        if (!dbUser) {
+          // User deleted, invalidate session (return minimal session)
+          return { ...session, user: undefined };
+        }
       }
       return session;
     },
