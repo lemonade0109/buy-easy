@@ -36,7 +36,7 @@ BuyEasy is a full-stack, production-ready e-commerce platform built with Next.js
 - 🛒 Shopping cart (session-based for guests, persistent for users)
 - ⭐ Product reviews and ratings
 - 💳 Multiple payment methods: PayPal, Stripe, Cash on Delivery
-- 📧 Automated email receipts (Google SMTP)
+- 📧 Automated email receipts (Gmail SMTP + Nodemailer)
 - 📱 Responsive, mobile-first design with dark mode
 - 🔐 Secure authentication (NextAuth.js)
 - 📦 Order history and wishlist
@@ -73,7 +73,7 @@ BuyEasy is a full-stack, production-ready e-commerce platform built with Next.js
 - **ORM**: Prisma 6.16.1 with Neon Adapter
 - **Authentication**: NextAuth.js v5 (Auth.js)
 - **Payments**: PayPal SDK, Stripe
-- **Email**: Resend + React Email
+- **Email**: Gmail SMTP + Nodemailer
 - **File Upload**: UploadThing
 
 ### DevOps
@@ -93,7 +93,7 @@ BuyEasy is a full-stack, production-ready e-commerce platform built with Next.js
   - [UploadThing](https://uploadthing.com) - File uploads
   - [PayPal Developer](https://developer.paypal.com) - Payments
   - [Stripe](https://stripe.com) - Payments
-  - [Resend](https://resend.com) - Email
+  - Gmail SMTP (Nodemailer) - Email
 
 ## ⚡ Getting Started
 
@@ -146,9 +146,12 @@ UPLOADTHING_TOKEN=eyJhcGlLZXk...
 UPLOADTHING_SECRET=sk_live_xxxxx
 UPLOADTHING_APP_ID=your-app-id
 
-# Resend (no quotes!)
-RESEND_API_KEY=re_xxxxx
-SENDER_EMAIL=onboarding@resend.dev
+# Email (Gmail SMTP)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=465
+EMAIL_USER=your-gmail-address@gmail.com
+EMAIL_PASS=your-app-password
+SENDER_EMAIL=your-gmail-address@gmail.com
 ```
 
 ### 4. Set up the database
@@ -228,7 +231,7 @@ Uses NextAuth.js v5 with credentials provider. Supports:
 - **PayPal**: Sandbox integration with client SDK
 - **Stripe**: Test mode with Stripe Elements
 - **Cash on Delivery**: Manual processing
-- Order confirmation emails via Resend
+- Order confirmation emails via Gmail SMTP (Nodemailer)
 
 ### Image Upload
 
@@ -251,7 +254,7 @@ Uses NextAuth.js v5 with credentials provider. Supports:
 - Set `NEXT_PUBLIC_SERVER_URL` to your production URL
 - Use production API keys for PayPal, Stripe, etc.
 - Set `AUTH_SECRET` and `AUTH_TRUST_HOST=true`
-- Remove quotes from `UPLOADTHING_TOKEN` and `RESEND_API_KEY`
+- Remove quotes from `UPLOADTHING_TOKEN`
 
 ### Database Migration
 
