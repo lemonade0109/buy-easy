@@ -12,6 +12,7 @@ import {
 import LogoutButton from "./logout-button";
 import LinksDrawerMobile from "./links-drawer-mobile";
 import { useRouter } from "next/navigation";
+import { isAdminClient } from "@/lib/admin";
 
 interface MenuMobileClientProps {
   user:
@@ -63,7 +64,12 @@ const MenuMobileClient = ({ user }: MenuMobileClientProps) => {
             Cart
           </Button>
 
-          {user && <LinksDrawerMobile onNavigate={handleNavigation} />}
+          {user && (
+            <LinksDrawerMobile
+              onNavigate={handleNavigation}
+              isAdmin={isAdminClient(user?.email)}
+            />
+          )}
           {user ? (
             <LogoutButton />
           ) : (

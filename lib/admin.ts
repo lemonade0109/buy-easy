@@ -20,3 +20,14 @@ export function isAdmin(userEmail?: string | null): boolean {
   if (!userEmail) return false;
   return isAdminEmail(userEmail);
 }
+
+export function isAdminClient(email?: string | null): boolean {
+  if (!email) return false;
+  const adminEmails =
+    typeof window !== "undefined" && process.env.NEXT_PUBLIC_ADMIN_EMAILS
+      ? process.env.NEXT_PUBLIC_ADMIN_EMAILS.split(",").map((e) =>
+          e.trim().toLowerCase()
+        )
+      : [];
+  return adminEmails.includes(email.toLowerCase());
+}

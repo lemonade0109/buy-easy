@@ -62,9 +62,9 @@ const OrderDetailsTable = ({
   return (
     <>
       <h1 className="py-4 text-2xl">Order {formatId(id)}</h1>
-      <div className="grid md:grid-cols-3 md:gap-5">
-        <div className="col-span-2 space-4-y overflow-auto">
-          <Card>
+      <div className="grid md:grid-cols-3 md:gap-5 gap-3">
+        <div className="col-span-3 md:col-span-2 w-full space-4-y overflow-auto">
+          <Card className="w-full">
             <CardContent className="text-xl pb-4">
               <h2 className="text-xl pb-4">Payment Method</h2>
               <p className="pb-2">{paymentMethodIcon(paymentMethod)}</p>
@@ -79,11 +79,11 @@ const OrderDetailsTable = ({
             </CardContent>
           </Card>
 
-          <Card className="my-4">
+          <Card className="md:my-4 my-3 w-full">
             <CardContent className="text-xl pb-4">
               <h2 className="text-xl pb-4">Shipping Address</h2>
-              <p className="pb-2">{shippingAddress.fullName}</p>
-              <p className="pb-2">
+              <p className="pb-2 text-sm">{shippingAddress.fullName}</p>
+              <p className="pb-2 text-sm">
                 {shippingAddress.address} {shippingAddress.city}{" "}
                 {shippingAddress.postalCode}, {shippingAddress.country}
               </p>
@@ -98,7 +98,7 @@ const OrderDetailsTable = ({
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="w-full">
             <CardContent className="p-4 gap-4">
               <h2 className="text-xl pb-4">Order Items</h2>
               <Table>
@@ -139,8 +139,10 @@ const OrderDetailsTable = ({
           </Card>
         </div>
 
-        <div className="">
-          <Card>
+        <div className="col-span-3 md:col-span-1 w-full">
+          <div className="mb-2 text-xl font-semibold">Order Summary</div>
+
+          <Card className="w-full">
             <CardContent className="p-4 gap-4 space-y-4">
               <div className="flex justify-between">
                 <div>Items</div>
