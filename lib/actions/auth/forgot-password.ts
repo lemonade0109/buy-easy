@@ -32,7 +32,8 @@ export const requestPasswordReset = async (
     const firstName = user.name.split(" ")[0];
 
     const token = await createPasswordResetToken(user.id);
-    await sendPasswordResetEmail(user.email, token, firstName);
+
+    await sendPasswordResetEmail(lookupEmail, token, firstName);
     return {
       success: true,
       message:

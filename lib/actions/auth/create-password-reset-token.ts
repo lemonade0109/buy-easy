@@ -1,5 +1,3 @@
-import { auth } from "@/auth";
-import React from "react";
 import crypto from "crypto";
 import { prisma } from "@/db/prisma";
 
